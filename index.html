@@ -1,0 +1,1080 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SintonIA news</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Permanent+Marker&family=Sora:wght@400;500;600;800&display=swap" rel="stylesheet">
+<style>
+/* SintonIA news — estética de fanzine: papel, grano, collage y sombras duras.
+   Color por pregunta: amarillo = hoy, azul = futuro, naranja = brechas. */
+:root {
+  color-scheme: light;
+  --bg: #ece6d6;
+  --surface: #f8f4e9;
+  --paper2: #e2d9c3;
+  --ink: #16130f;
+  --ink-2: #4a453c;
+  --ink-3: #6b6457;
+  --grid: #d6ccb4;
+  --axis: #b3a78c;
+  --ring: rgba(22,19,15,0.16);
+  --accent: #2a6fdb;
+  --gap: #e8481c;
+  --gap-off: #d6ccb4;
+  --bar: #5d6b84;
+  --h-hoy: #f2b705;
+  --h-corto: #3987e5;
+  --h-mediano: #256abf;
+  --h-largo: #184f95;
+  --h-hoy-ink: #16130f;
+  --c1: #f2b705;
+  --c2: #2f5fe0;
+  --c3: #e8481c;
+  --good: #006300;
+  --warn-bg: #fff0bf;
+  --warn-ink: #6b4a00;
+  --font: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --sora: "Sora", var(--font);
+  --disp: "Anton", Impact, "Arial Narrow", sans-serif;
+  --mark: "Permanent Marker", "Comic Sans MS", cursive;
+  --hard: 4px 4px 0 var(--ink);
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; scroll-padding-top: 74px; }
+body {
+  margin: 0; background: var(--bg); color: var(--ink);
+  font: 15px/1.5 var(--font);
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  background-image: radial-gradient(60% 40% at 8% 0%, rgba(242,183,5,.16), transparent 70%), radial-gradient(50% 40% at 100% 30%, rgba(47,95,224,.10), transparent 70%);
+  background-attachment: fixed;
+}
+/* grano de papel sobre toda la página */
+body::before {
+  content: ""; position: fixed; inset: 0; z-index: 60; pointer-events: none; opacity: .32; mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 .1 0 0 0 0 .08 0 0 0 0 .05 0 0 0 .6 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+}
+.wrap { max-width: 1180px; margin: 0 auto; }
+h1, h2, h3, p { margin: 0; }
+h3 { font-size: 15px; line-height: 1.35; }
+a { color: var(--accent); }
+a:focus-visible, button:focus-visible, [tabindex]:focus-visible, select:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+.marker { font-family: var(--mark); }
+
+/* ---------- barra ---------- */
+nav.bar {
+  position: sticky; top: 0; z-index: 8; background: var(--bg); margin-inline: calc(-1 * max(16px, env(safe-area-inset-left, 0px)));
+  padding: 10px max(16px, env(safe-area-inset-left, 0px)); border-bottom: 2px solid var(--ink);
+  display: flex; flex-wrap: wrap; gap: 8px 18px; align-items: center; justify-content: space-between;
+}
+.brand { font-family: var(--disp); font-size: 24px; letter-spacing: .03em; color: var(--ink); text-decoration: none; display: inline-flex; align-items: center; gap: 8px; text-transform: uppercase; }
+.brand i { font-style: normal; background: var(--c3); color: var(--surface); padding: 0 5px; transform: rotate(-3deg); display: inline-block; box-shadow: 2px 2px 0 var(--ink); }
+.brand small { font: 400 15px var(--mark); text-transform: none; color: var(--ink-2); }
+nav.bar .links { display: flex; gap: 2px 16px; flex-wrap: wrap; }
+nav.bar .links a { color: var(--ink); text-decoration: none; font-size: 14px; font-weight: 600; padding: 4px 2px; border-bottom: 3px solid transparent; }
+nav.bar .links a:hover { border-bottom-color: var(--c3); }
+.filtro { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; }
+.filtro select { font: inherit; font-size: 13px; padding: 5px 8px; border-radius: 8px; border: 2px solid var(--ink); background: var(--surface); color: var(--ink); max-width: 100%; }
+
+.estado { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; font-size: 13px; color: var(--ink-2); }
+.estado .pill { padding: 3px 10px; border-radius: 999px; border: 1.5px solid var(--ink); background: var(--surface); }
+.estado .pill.warn { background: var(--warn-bg); color: var(--warn-ink); }
+.estado-row { margin-top: 8px; }
+.btn { font: inherit; font-size: 13px; font-weight: 600; padding: 5px 12px; border-radius: 8px; border: 2px solid var(--ink); background: var(--surface); color: var(--ink); cursor: pointer; box-shadow: 2px 2px 0 var(--ink); transition: transform .15s, box-shadow .15s; }
+.btn:hover { transform: translate(-1px,-1px); box-shadow: 3px 3px 0 var(--ink); }
+.zbtn { font: 600 14px var(--sora); background: var(--ink); color: var(--surface); border: 2px solid var(--ink); padding: 12px 20px; box-shadow: 4px 4px 0 var(--c3); text-decoration: none; display: inline-flex; gap: 10px; align-items: center; cursor: pointer; transition: transform .15s, box-shadow .15s; }
+.zbtn:hover { transform: translate(-2px,-2px); box-shadow: 6px 6px 0 var(--c3); }
+.zbtn.ghost { background: transparent; color: var(--ink); box-shadow: 4px 4px 0 var(--ink); }
+.zbtn.ghost:hover { box-shadow: 6px 6px 0 var(--ink); }
+.zbtn.sm { padding: 8px 14px; font-size: 13px; }
+
+/* ---------- portada ---------- */
+.portada { position: relative; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.02fr); gap: 10px 20px; margin-top: 26px; align-items: center; }
+.p-izq { display: grid; gap: 20px; align-content: center; padding-block: 10px; position: relative; z-index: 2; }
+.p-top { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+.sello { font: 600 11.5px var(--sora); letter-spacing: .12em; text-transform: uppercase; border: 2px solid var(--ink); padding: 5px 10px; background: var(--surface); transform: rotate(-1.5deg); }
+.p-top .marker { font-size: 17px; color: var(--c3); transform: rotate(-2deg); display: inline-block; }
+.portada h1 { display: grid; justify-items: start; }
+.h1a { font: 400 clamp(64px, 11.4vw, 144px)/.86 var(--disp); letter-spacing: -.005em; color: var(--ink); text-transform: uppercase; white-space: nowrap; }
+.ia { display: inline-block; background: var(--c3); color: var(--surface); padding: 0 .07em; margin-left: .03em; transform: rotate(-2.5deg); box-shadow: .045em .045em 0 var(--ink); }
+.h1b { font: 400 clamp(26px, 4.6vw, 54px)/1 var(--mark); background: var(--c1); padding: 2px 14px 4px; transform: rotate(-3deg) translate(10px, -4px); margin-top: -.1em; box-shadow: 3px 3px 0 var(--ink); }
+.p-lead { font-size: 16px; line-height: 1.6; max-width: 46ch; color: var(--ink-2); }
+.p-lead mark { background: linear-gradient(transparent 55%, rgba(242,183,5,.75) 55%); color: var(--ink); font-weight: 600; padding: 0 2px; }
+.p-cta { display: flex; gap: 16px; flex-wrap: wrap; align-items: center; }
+.p-src { display: flex; flex-wrap: wrap; gap: 4px 14px; align-items: baseline; font-size: 13px; color: var(--ink-3); }
+.p-src b { font: 400 16px var(--mark); color: var(--ink); }
+.p-src span + span::before { content: "/"; margin-right: 14px; color: var(--axis); }
+
+/* collage de la derecha */
+.coll { position: relative; height: clamp(440px, 52vw, 600px); }
+.foto-main { position: absolute; right: 3%; top: 0; width: 74%; height: 84%; transform: rotate(2.2deg); filter: drop-shadow(9px 10px 0 var(--ink)); }
+.gr { position: relative; overflow: hidden; width: 100%; height: 100%; background: var(--c3); isolation: isolate; }
+.gr img { width: 100%; height: 100%; object-fit: cover; display: block; filter: grayscale(1) contrast(1.3) brightness(1.15); mix-blend-mode: screen; }
+.gr::after { content: ""; position: absolute; inset: 0; pointer-events: none; mix-blend-mode: multiply; opacity: .55;
+  background: radial-gradient(circle at 1px 1px, rgba(22,19,15,.55) 1px, transparent 1.5px) 0 0 / 5px 5px; }
+.gr-or { background: var(--c3); }
+.gr-bl { background: var(--c2); }
+.gr-pk { background: #e56fa0; }
+.torn { clip-path: polygon(0 2%,4% 0,9% 2.5%,15% .5%,22% 3%,30% 1%,38% 2.5%,47% 0,55% 2%,63% .5%,72% 3%,80% 1%,88% 2.5%,95% 0,100% 2%,100% 97%,95% 99.5%,88% 97%,80% 99%,72% 96.5%,63% 99.5%,55% 97.5%,47% 100%,38% 97%,30% 99%,22% 96.5%,15% 99.5%,9% 97%,4% 100%,0 98%); }
+.pola { position: absolute; margin: 0; background: #faf7ee; padding: 8px 8px 0; box-shadow: 4px 5px 0 var(--ink); border: 2px solid var(--ink); z-index: 3; }
+.pola .gr { aspect-ratio: 1 / 1; height: auto; }
+.pola figcaption { font: 400 15px/1.1 var(--mark); padding: 7px 2px 9px; text-align: center; color: var(--ink); }
+.pv { left: 0; bottom: 17%; width: 31%; transform: rotate(-7deg); }
+.pn { right: -1%; top: 5%; width: 25%; transform: rotate(6deg); }
+.cinta { position: absolute; width: 96px; height: 26px; background: rgba(242,183,5,.8); border: 1px solid rgba(22,19,15,.2); z-index: 4; }
+.t1 { top: -8px; right: 32%; transform: rotate(-7deg); }
+.t2 { left: 3%; bottom: 40%; transform: rotate(-40deg); width: 80px; }
+.sticker { position: absolute; left: 25%; top: 4%; z-index: 5; width: clamp(84px, 11vw, 120px); height: auto; transform: rotate(-12deg); filter: drop-shadow(3px 3px 0 var(--ink)); }
+.stk-spin { transform-box: fill-box; transform-origin: center; animation: giro 22s linear infinite; }
+@keyframes giro { to { transform: rotate(360deg); } }
+.ficha { position: absolute; right: 0; bottom: 0; z-index: 6; width: min(310px, 62%); background: var(--surface); border: 2px solid var(--ink); padding: 14px 16px 12px; transform: rotate(-1.6deg); box-shadow: 6px 6px 0 var(--ink); display: grid; gap: 8px; }
+.ficha .marker { font-size: 14px; color: var(--c3); }
+.ficha strong { font: 600 15px/1.25 var(--sora); }
+.ficha p { font-size: 12.5px; color: var(--ink-2); display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.f-pie { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+.f-dots { display: flex; gap: 6px; }
+.dot { width: 9px; height: 9px; border-radius: 50%; border: 2px solid var(--ink); padding: 0; background: transparent; cursor: pointer; }
+.dot[aria-current="true"] { background: var(--c3); }
+.ficha.sw { animation: fi .5s ease; }
+@keyframes fi { from { transform: rotate(-1.6deg) translateY(12px); } to { transform: rotate(-1.6deg); } }
+/* cinta de noticias */
+.marq { grid-column: 1 / -1; margin-top: 8px; margin-inline: -16px; background: var(--c3); border-block: 2px solid var(--ink); transform: rotate(-.8deg); overflow: hidden; padding: 9px 0; box-shadow: 0 4px 0 var(--ink); }
+.marq-in { display: flex; width: max-content; animation: marq 60s linear infinite; font: 400 19px var(--disp); text-transform: uppercase; letter-spacing: .05em; white-space: nowrap; }
+.marq-in span { padding: 0 16px; }
+.marq-in i { font-style: normal; color: var(--surface); }
+@keyframes marq { to { transform: translateX(-50%); } }
+
+/* ---------- las 3 preguntas (índice) ---------- */
+.preg { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; margin-top: 42px; }
+.pq { position: relative; display: grid; gap: 4px; padding: 18px 20px 16px; border: 2px solid var(--ink); box-shadow: 6px 6px 0 var(--ink); text-decoration: none; color: var(--ink); overflow: hidden; transition: transform .2s, box-shadow .2s; }
+.pq:nth-child(1) { background: var(--c1); transform: rotate(-.7deg); }
+.pq:nth-child(2) { background: var(--c2); color: var(--surface); transform: rotate(.5deg); }
+.pq:nth-child(3) { background: var(--c3); transform: rotate(-.4deg); }
+.pq:hover { transform: rotate(0) translate(-3px,-3px); box-shadow: 9px 9px 0 var(--ink); }
+.pq-n { font: 400 64px/.9 var(--disp); opacity: .95; }
+.pq-q { font: 400 26px/1.05 var(--disp); text-transform: uppercase; letter-spacing: .01em; }
+.pq-m { font-size: 13.5px; font-weight: 600; margin-top: 6px; }
+.pq-a { position: absolute; right: 14px; top: 10px; font: 400 30px var(--disp); }
+.pq::after { content: ""; position: absolute; inset: 0; pointer-events: none; mix-blend-mode: multiply; opacity: .25; background: radial-gradient(circle at 1px 1px, rgba(22,19,15,.6) 1px, transparent 1.5px) 0 0 / 6px 6px; -webkit-mask-image: linear-gradient(135deg, transparent 45%, #000); mask-image: linear-gradient(135deg, transparent 45%, #000); }
+
+/* ---------- títulos de sección ---------- */
+section.bloque { margin-top: 74px; }
+.sec-h { display: grid; gap: 6px; margin-bottom: 22px; }
+.sec-h .marker { font-size: 20px; color: var(--c3); transform: rotate(-1.5deg); justify-self: start; }
+.sec-h h2, .cap-t h2 { font: 400 clamp(34px, 5.4vw, 64px)/.98 var(--disp); text-transform: uppercase; letter-spacing: .005em; text-wrap: balance; }
+.sec-h p { color: var(--ink-2); max-width: 70ch; }
+
+/* ---------- capítulos (una banda de color por pregunta) ---------- */
+.cap { margin-top: 90px; position: relative; --cc: var(--c1); --cci: var(--ink); }
+.cap2 { --cc: var(--c2); --cci: var(--surface); }
+.cap3 { --cc: var(--c3); --cci: var(--ink); }
+.cap-band { position: relative; display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 8px 28px; align-items: center; background: var(--cc); color: var(--cci); border: 2px solid var(--ink); box-shadow: 8px 8px 0 var(--ink); padding: 22px 32px 24px; overflow: hidden; }
+.cap-band::before { content: ""; position: absolute; inset: 0; pointer-events: none; mix-blend-mode: multiply; opacity: .28; background: radial-gradient(circle at 1px 1px, rgba(22,19,15,.65) 1px, transparent 1.6px) 0 0 / 6px 6px; -webkit-mask-image: linear-gradient(100deg, transparent 35%, #000); mask-image: linear-gradient(100deg, transparent 35%, #000); }
+.cap-n { font: 400 clamp(88px, 15vw, 190px)/.8 var(--disp); color: transparent; -webkit-text-stroke: 3px var(--cci); position: relative; }
+.cap-t { display: grid; gap: 8px; position: relative; }
+.cap-t .marker { font-size: 19px; transform: rotate(-1.5deg); justify-self: start; background: var(--surface); color: var(--ink); padding: 1px 10px; border: 2px solid var(--ink); }
+.cap-t p { max-width: 62ch; font-size: 14.5px; font-weight: 500; }
+.cap-of { position: relative; align-self: start; font: 400 16px var(--disp); letter-spacing: .1em; border: 2px solid var(--cci); padding: 2px 10px; }
+.cap-body { margin-top: 30px; }
+.cap-corte { display: flex; align-items: center; gap: 14px; margin: 0 0 -60px; justify-content: center; font: 400 20px var(--mark); color: var(--ink-3); }
+
+/* ---------- paneles, tarjetas ---------- */
+.grid2 { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); gap: 20px; align-items: start; }
+.panel { background: var(--surface); border: 2px solid var(--ink); border-radius: 12px; padding: 18px; min-width: 0; box-shadow: var(--hard); }
+.panel > h3 { margin-bottom: 4px; font: 400 22px/1.1 var(--disp); text-transform: uppercase; letter-spacing: .02em; }
+.panel > .sub { font-size: 13px; color: var(--ink-2); margin-bottom: 12px; }
+.cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 16px; }
+.card {
+  text-align: left; font: inherit; color: inherit; cursor: pointer; padding: 0; overflow: hidden;
+  background: var(--surface); border: 2px solid var(--ink); border-radius: 12px; box-shadow: var(--hard);
+  display: grid; gap: 0; align-content: start; min-width: 0; transition: transform .2s, box-shadow .2s;
+}
+.card:hover { transform: translate(-2px,-2px); box-shadow: 7px 7px 0 var(--ink); }
+.card .foto { position: relative; height: 128px; background: var(--c2); overflow: hidden; border-bottom: 2px solid var(--ink); }
+.card .foto img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .5s ease; }
+.card:hover .foto img { transform: scale(1.06); }
+.card .foto .chip { position: absolute; left: 10px; top: 10px; z-index: 1; }
+.card .foto .tag { position: absolute; left: 10px; bottom: 9px; z-index: 1; background: var(--surface); color: var(--ink); border: 1.5px solid var(--ink); }
+.card .cb { padding: 12px 14px 14px; display: grid; gap: 8px; }
+.card .meta, .meta { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.card h3 { text-wrap: pretty; }
+.card .txt { font-size: 13px; color: var(--ink-2); }
+.card .more { font-size: 12px; color: var(--ink); font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
+.tag { font-size: 12px; padding: 2px 8px; border-radius: 999px; border: 1.5px solid var(--ink); color: var(--ink); white-space: nowrap; font-weight: 600; }
+.chip { font-size: 12px; padding: 2px 9px; border-radius: 999px; font-weight: 700; white-space: nowrap; color: #fff; border: 1.5px solid var(--ink); }
+.chip[data-h="Hoy"] { background: var(--h-hoy); color: var(--h-hoy-ink); }
+.chip[data-h="Corto"] { background: var(--h-corto); }
+.chip[data-h="Mediano"] { background: var(--h-mediano); }
+.chip[data-h="Largo"] { background: var(--h-largo); }
+.cols { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; }
+.col { background: var(--surface); border: 2px solid var(--ink); border-radius: 12px; padding: 14px; display: grid; gap: 14px; align-content: start; min-width: 0; box-shadow: var(--hard); }
+.col > header { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; flex-wrap: wrap; border-bottom: 2px dashed var(--axis); padding-bottom: 10px; }
+.col > header .rango { font-size: 12px; color: var(--ink-3); font-weight: 600; }
+.col .card { box-shadow: 3px 3px 0 var(--ink); }
+.vacio { font-size: 13px; color: var(--ink-3); padding: 8px 0; }
+.meter { display: inline-flex; gap: 3px; vertical-align: middle; }
+.meter i { width: 14px; height: 9px; border-radius: 2px; background: var(--gap-off); display: block; border: 1px solid rgba(22,19,15,.25); }
+.meter i.on { background: var(--gap); border-color: var(--ink); }
+.rank { list-style: none; padding: 0; margin: 0; display: grid; gap: 6px; }
+.rank button { width: 100%; text-align: left; font: inherit; color: inherit; cursor: pointer; background: none; border: 2px solid transparent; border-radius: 10px; padding: 8px; display: grid; grid-template-columns: 48px 1fr; gap: 4px 12px; align-items: center; }
+.rank button:hover { background: var(--bg); border-color: var(--ink); }
+.rank .t { font-size: 14px; line-height: 1.35; font-weight: 600; }
+.rank .tx { display: grid; gap: 4px; min-width: 0; }
+.rank .r { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.thumb { width: 48px; height: 48px; border-radius: 8px; border: 2px solid var(--ink); object-fit: cover; flex: none; background: var(--c2); }
+svg text { font-family: var(--font); }
+.chart-wrap { position: relative; }
+.tip { position: absolute; pointer-events: none; z-index: 3; max-width: 260px; background: var(--ink); color: var(--surface); font-size: 12px; line-height: 1.4; padding: 6px 9px; border-radius: 7px; transform: translate(-50%, -110%); opacity: 0; transition: opacity .1s; }
+.tip.on { opacity: 1; }
+.leyenda { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 12px; color: var(--ink-2); margin-top: 10px; align-items: center; }
+.leyenda .sw { display: inline-block; width: 12px; height: 12px; border-radius: 50%; vertical-align: -1px; margin-right: 5px; border: 1.5px solid var(--ink); }
+.barras { display: grid; gap: 9px; }
+.barra { display: grid; grid-template-columns: minmax(90px, 140px) 1fr 28px; gap: 8px; align-items: center; font-size: 13px; font-weight: 600; }
+.barra .pista { height: 16px; background: var(--grid); border: 1.5px solid var(--ink); }
+.barra .rell { height: 100%; background: var(--c1); border-right: 1.5px solid var(--ink); min-width: 2px; }
+.barra .n { text-align: right; color: var(--ink-2); font-variant-numeric: tabular-nums; }
+.tabla-wrap { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: 13px; min-width: 640px; }
+th, td { text-align: left; padding: 9px 10px; border-bottom: 1.5px solid var(--grid); vertical-align: top; }
+th { color: var(--ink); font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: .06em; border-bottom: 2px solid var(--ink); }
+
+/* ---------- carpetas por tema ---------- */
+.fold-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(158px, 1fr)); gap: 18px 16px; padding-top: 34px; }
+.fold { position: relative; height: 150px; cursor: pointer; background: none; border: 0; padding: 0; font: inherit; color: var(--ink); text-align: left; transition: transform .25s; }
+.fold-tab { position: absolute; left: 0; top: 24px; width: 52%; height: 24px; background: var(--fc); border: 2px solid var(--ink); border-bottom: 0; border-radius: 10px 10px 0 0; z-index: 1; }
+.fold-back { position: absolute; left: 0; right: 0; top: 44px; bottom: 0; background: var(--fc); border: 2px solid var(--ink); border-radius: 0 12px 12px 12px; z-index: 1; }
+.fold-pic { position: absolute; left: 12px; right: 12px; top: 8px; height: 84px; border: 2px solid var(--ink); border-radius: 6px; overflow: hidden; background: #fff; transform: rotate(-2.5deg); transition: transform .35s cubic-bezier(.34,1.4,.5,1); z-index: 2; }
+.fold-pic img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.fold-lid { position: absolute; left: 0; right: 0; top: 64px; bottom: 0; background: var(--fc); border: 2px solid var(--ink); border-radius: 12px; z-index: 3; padding: 10px 12px; display: flex; flex-direction: column; justify-content: flex-end; gap: 2px; box-shadow: 3px 3px 0 var(--ink); transition: box-shadow .25s; }
+.fold-n { font: 400 19px/1.05 var(--disp); text-transform: uppercase; letter-spacing: .02em; }
+.fold-c { font-size: 12px; font-weight: 600; }
+.fold:hover .fold-pic, .fold[aria-pressed="true"] .fold-pic { transform: translateY(-16px) rotate(0); }
+.fold[aria-pressed="true"] { transform: translateY(-4px); }
+.fold[aria-pressed="true"] .fold-lid { box-shadow: 6px 6px 0 var(--ink); }
+.fold:focus-visible { outline: 3px solid var(--accent); outline-offset: 5px; }
+.fold-panel { margin-top: 20px; border: 2px solid var(--ink); border-top-width: 10px; border-top-color: var(--fcc, var(--c1)); background: var(--surface); box-shadow: var(--hard); padding: 16px 18px 18px; border-radius: 4px 4px 12px 12px; }
+.fold-panel > header { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin-bottom: 14px; }
+.fold-panel h3 { font: 400 26px/1 var(--disp); text-transform: uppercase; letter-spacing: .02em; }
+.fold-panel header span { font-size: 13px; color: var(--ink-2); }
+.minis { display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 12px; }
+.mini { display: grid; grid-template-columns: 96px minmax(0, 1fr); gap: 12px; text-align: left; font: inherit; color: inherit; cursor: pointer; background: var(--bg); border: 2px solid var(--ink); border-radius: 10px; padding: 8px; box-shadow: 3px 3px 0 var(--ink); transition: transform .15s, box-shadow .15s; }
+.mini:hover { transform: translate(-2px,-2px); box-shadow: 5px 5px 0 var(--ink); }
+.mini img { width: 96px; height: 80px; object-fit: cover; border-radius: 6px; border: 1.5px solid var(--ink); display: block; background: var(--c2); }
+.mini .mt { display: grid; gap: 6px; align-content: start; min-width: 0; }
+.mini .mh { font-size: 13.5px; line-height: 1.3; font-weight: 600; display: block; }
+
+/* ---------- discos en cascada (notas) ---------- */
+.dc { position: relative; display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 10px 30px; align-items: center; background: var(--paper2); border: 2px solid var(--ink); box-shadow: 8px 8px 0 var(--ink); padding: 26px 30px; overflow: hidden; }
+.dc::before { content: ""; position: absolute; inset: 0; pointer-events: none; opacity: .5; background: radial-gradient(circle at 1px 1px, rgba(22,19,15,.18) 1px, transparent 1.4px) 0 0 / 7px 7px; }
+.dc-stage { position: relative; height: 420px; cursor: grab; user-select: none; touch-action: pan-y; --D: 320px; overflow: hidden; }
+.dc-stage.arrastrando { cursor: grabbing; }
+.dc-stage:focus-visible { outline: 3px solid var(--accent); outline-offset: 4px; }
+#dcDiscs { position: absolute; inset: 0; }
+.dc-disc { position: absolute; left: 3%; top: 50%; width: var(--D); height: var(--D); margin-top: calc(var(--D) / -2); border-radius: 50%; cursor: pointer; will-change: transform, opacity; filter: drop-shadow(8px 12px 0 rgba(22,19,15,.28)); }
+.dc-spin { position: absolute; inset: 0; border-radius: 50%; border: 2px solid var(--ink);
+  background: radial-gradient(circle, #1d1a17 0 37%, transparent 37.3%), repeating-radial-gradient(circle at center, #26221e 0 1.4px, #12100e 1.4px 3px);
+  animation: giro 7s linear infinite; animation-play-state: paused; }
+.dc-disc.on .dc-spin { animation-play-state: running; }
+.dc-disc::after { content: ""; position: absolute; inset: 0; border-radius: 50%; pointer-events: none; background: conic-gradient(from 30deg, transparent 0 17%, rgba(255,255,255,.26) 23%, transparent 29% 66%, rgba(255,255,255,.18) 72%, transparent 78%); }
+.dc-label { position: absolute; left: 50%; top: 50%; width: 38%; height: 38%; transform: translate(-50%, -50%); border-radius: 50%; overflow: hidden; border: 3px solid var(--ink); background: var(--c2); box-shadow: 0 0 0 5px var(--hc, var(--c1)); }
+.dc-label img { width: 100%; height: 100%; object-fit: cover; display: block; pointer-events: none; }
+.dc-label::after { content: ""; position: absolute; left: 50%; top: 50%; width: 13%; height: 13%; border-radius: 50%; background: var(--bg); border: 2px solid var(--ink); transform: translate(-50%, -50%); }
+.dc-info { position: relative; display: grid; gap: 18px; }
+.dc-txt { display: grid; gap: 10px; align-content: start; min-height: 250px; }
+.dc-src { font: 400 17px var(--mark); color: var(--c3); transform: rotate(-1deg); transform-origin: left; }
+.dc-txt h3 { font: 600 clamp(19px, 2.4vw, 25px)/1.25 var(--sora); text-wrap: balance; }
+.dc-tr { font-size: 14px; color: var(--ink-2); }
+.dc-act { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 6px; }
+.dc-ctrl { display: flex; align-items: center; gap: 14px; font: 400 18px var(--disp); letter-spacing: .08em; font-variant-numeric: tabular-nums; }
+.dc-ctrl .btn { font-size: 16px; padding: 4px 14px; }
+.dc-hint { font-size: 12px; color: var(--ink-3); font-family: var(--font); letter-spacing: 0; }
+
+/* ---------- detalle ---------- */
+#velo { position: fixed; inset: 0; background: rgba(22,19,15,.45); z-index: 70; display: none; }
+#velo.on { display: block; }
+#detalle { position: fixed; top: 0; right: 0; bottom: 0; width: min(480px, 100%); z-index: 71; background: var(--surface); border-left: 3px solid var(--ink); overflow-y: auto; padding: 20px max(18px, env(safe-area-inset-right, 0px)) 28px 20px; display: none; }
+#detalle.on { display: block; }
+#detalle .cerrar { position: absolute; top: 12px; right: 12px; z-index: 3; }
+#detalle h2 { margin: 10px 36px 10px 0; font: 400 30px/1.05 var(--disp); text-transform: uppercase; }
+#detalle .meta { display: flex; flex-wrap: wrap; gap: 6px; }
+.banner { position: relative; height: 190px; margin: -20px -18px 16px -20px; background: var(--c2); border-bottom: 3px solid var(--ink); }
+.banner img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.comp { display: grid; gap: 10px; margin: 16px 0; }
+.comp > div { border: 2px solid var(--ink); border-radius: 10px; padding: 10px 12px; background: var(--bg); }
+.comp .k { font-size: 11px; letter-spacing: .07em; text-transform: uppercase; color: var(--ink-3); margin-bottom: 2px; font-weight: 700; }
+.brecha-box { background: var(--c1); border: 2px solid var(--ink); border-radius: 10px; padding: 12px; margin-bottom: 14px; display: grid; gap: 6px; box-shadow: 3px 3px 0 var(--ink); }
+.brecha-box .k { color: var(--ink) !important; font-weight: 700; }
+.fuente-box { border-top: 2px dashed var(--axis); padding-top: 12px; font-size: 13px; color: var(--ink-2); display: grid; gap: 4px; }
+
+/* ---------- pie ---------- */
+footer.pie { padding-block: 40px 8px; color: var(--ink-2); font-size: 12.5px; max-width: 84ch; display: grid; gap: 8px; }
+.credito { color: var(--ink-3); }
+.wm { margin-top: 30px; padding: 26px 0 26px; border-top: 2px solid var(--ink); }
+.wm canvas { display: block; width: 100%; }
+.wm-cap { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; font-size: 12px; color: var(--ink-3); margin-top: 10px; font-weight: 600; }
+
+@media (max-width: 980px) {
+  .portada { grid-template-columns: minmax(0, 1fr); }
+  .coll { height: clamp(420px, 92vw, 560px); margin-top: 6px; }
+  .preg { grid-template-columns: minmax(0, 1fr); }
+  .dc { grid-template-columns: minmax(0, 1fr); padding: 20px 18px; }
+  .dc-stage { height: 330px; }
+  .dc-txt { min-height: 0; }
+}
+@media (max-width: 820px) {
+  .grid2, .cols { grid-template-columns: minmax(0, 1fr); }
+  .barra { grid-template-columns: minmax(80px, 110px) 1fr 24px; }
+  .cap-band { grid-template-columns: minmax(0, 1fr); padding: 18px 20px 20px; }
+  .cap-n { font-size: 84px; }
+  .cap-of { position: absolute; right: 14px; top: 14px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .marq-in, .stk-spin, .dc-spin, .ficha.sw { animation: none !important; }
+  * { transition-duration: 0s !important; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<nav class="bar" aria-label="Secciones">
+  <a class="brand" href="#inicio" aria-label="SintonIA news, inicio">
+    <svg width="26" height="26" viewBox="0 0 26 26" aria-hidden="true"><circle cx="13" cy="13" r="11.5" fill="#f2b705" stroke="#16130f" stroke-width="2"/><circle cx="13" cy="13" r="3" fill="#16130f"/><path d="M13 13 L20 6" stroke="#e8481c" stroke-width="2.4" stroke-linecap="round"/></svg>
+    Sinton<i>IA</i> <small>news</small>
+  </a>
+  <div class="links">
+    <a href="#hoy">Hoy</a>
+    <a href="#futuro">Futuro</a>
+    <a href="#brechas">Brechas</a>
+    <a href="#temas">Temas</a>
+    <a href="#noticias">Notas</a>
+    <a href="#fuentes">Fuentes</a>
+  </div>
+  <label class="filtro">Categoría
+    <select id="fCat"></select>
+  </label>
+</nav>
+
+<header class="portada" id="inicio">
+  <div class="p-izq">
+    <div class="p-top"><span class="sello">IA × música · notas de la industria</span><span class="marker" id="pFecha"></span></div>
+    <h1 aria-label="SintonIA news"><span class="h1a" aria-hidden="true">Sinton<span class="ia">IA</span></span><span class="h1b" aria-hidden="true">news</span></h1>
+    <p class="p-lead">Un agente <mark>lee a diario</mark> medios y newsrooms de la industria musical, un modelo de lenguaje extrae las tendencias y este panel las ordena en <mark>tres preguntas</mark>: qué pasa hoy, qué puede venir y dónde están las brechas. Cada dato lleva el enlace a la nota original.</p>
+    <div class="p-cta">
+      <a class="zbtn" href="#preguntas">Empezar a sintonizar <span aria-hidden="true">↓</span></a>
+      <a class="zbtn ghost" href="#noticias">Ver las notas</a>
+    </div>
+    <div class="p-src" id="heroSrc" aria-label="Fuentes consultadas"></div>
+  </div>
+  <div class="coll">
+    <div class="foto-main"><div class="gr gr-or torn"><img id="imgMain" alt="Guitarrista de pelo largo tocando en un recital"></div></div>
+    <span class="cinta t1" aria-hidden="true"></span><span class="cinta t2" aria-hidden="true"></span>
+    <figure class="pola pv"><div class="gr gr-bl"><img id="imgVinilo" alt="Disco de vinilo girando en una bandeja"></div><figcaption>lado A</figcaption></figure>
+    <figure class="pola pn"><div class="gr gr-pk"><img id="imgNeon" alt="Cartel de neón: you are what you listen to"></div><figcaption>you are what you listen to</figcaption></figure>
+    <svg class="sticker" viewBox="0 0 120 120" aria-hidden="true"><defs><path id="cir" d="M60 60 m-44 0 a44 44 0 1 1 88 0 a44 44 0 1 1 -88 0"/></defs><circle cx="60" cy="60" r="58" fill="#f2b705" stroke="#16130f" stroke-width="2.5"/><g class="stk-spin"><text font-family="Anton, Impact, sans-serif" font-size="13" letter-spacing="2.2" fill="#16130f"><textPath href="#cir">SINTONÍA · NEWS · IA × MÚSICA · </textPath></text></g><circle cx="60" cy="60" r="20" fill="#16130f"/><circle cx="60" cy="60" r="6" fill="#f2b705"/><circle cx="60" cy="60" r="2" fill="#16130f"/></svg>
+    <div class="ficha" id="ficha" aria-live="polite"></div>
+  </div>
+  <div class="marq" aria-hidden="true"><div class="marq-in" id="marq"></div></div>
+</header>
+
+<section class="preg" id="preguntas" aria-label="Las tres preguntas"></section>
+
+<section class="bloque" id="temas">
+  <header class="sec-h">
+    <span class="marker">el archivo</span>
+    <h2>Explorá por tema</h2>
+    <p>Elegí una carpeta y abajo aparecen sus tendencias, con la de mayor brecha primero. Tocá una para ver el detalle.</p>
+  </header>
+  <div class="fold-row" id="folds"></div>
+  <div class="fold-panel" id="foldPanel" aria-live="polite"></div>
+</section>
+
+<section class="cap cap1" id="hoy">
+  <div class="cap-band">
+    <span class="cap-n" aria-hidden="true">01</span>
+    <div class="cap-t">
+      <span class="marker">pregunta uno · mirá lo que ya pasa</span>
+      <h2>¿Qué está pasando hoy?</h2>
+      <p>Tendencias que ya forman parte de la práctica de la industria. Elegí una tarjeta para ver qué hace el promedio y qué podría hacer a medida que madure.</p>
+    </div>
+    <span class="cap-of">01 / 03</span>
+  </div>
+  <div class="cap-body grid2">
+    <div class="cards" id="cardsHoy"></div>
+    <div class="panel">
+      <h3>Hoy, por categoría</h3>
+      <p class="sub">Cantidad de tendencias detectadas</p>
+      <div class="barras" id="barrasCat"></div>
+    </div>
+  </div>
+</section>
+
+<section class="cap cap2" id="futuro">
+  <div class="cap-band">
+    <span class="cap-n" aria-hidden="true">02</span>
+    <div class="cap-t">
+      <span class="marker">pregunta dos · proyectá lo que viene</span>
+      <h2>¿Qué puede venir?</h2>
+      <p>Lo que las fuentes anticipan, ordenado por plazo. Los plazos mediano y largo son proyecciones del modelo a partir de señales de las notas, no datos confirmados.</p>
+    </div>
+    <span class="cap-of">02 / 03</span>
+  </div>
+  <div class="cap-body cols" id="cols"></div>
+</section>
+
+<section class="cap cap3" id="brechas">
+  <div class="cap-band">
+    <span class="cap-n" aria-hidden="true">03</span>
+    <div class="cap-t">
+      <span class="marker">pregunta tres · comparalo con el promedio</span>
+      <h2>¿Dónde están las brechas?</h2>
+      <p>La brecha es la distancia entre lo que la industria hace en promedio hoy y lo que podría hacer cuando la tendencia madure. Arriba a la izquierda están las más grandes y menos maduras.</p>
+    </div>
+    <span class="cap-of">03 / 03</span>
+  </div>
+  <div class="cap-body grid2">
+    <div class="panel">
+      <h3>Madurez y tamaño de la brecha</h3>
+      <p class="sub">Cada punto es una tendencia. El color indica el horizonte.</p>
+      <div class="chart-wrap" id="scatterWrap">
+        <svg id="scatter" viewBox="0 0 640 430" role="img" aria-label="Gráfico de dispersión: madurez contra tamaño de la brecha por tendencia. Los mismos datos están en la tabla de abajo."></svg>
+        <div class="tip" id="tip"></div>
+      </div>
+      <div class="leyenda" id="leyenda"></div>
+    </div>
+    <div class="panel">
+      <h3>Las brechas más grandes</h3>
+      <p class="sub">Ordenadas por tamaño de la brecha</p>
+      <ol class="rank" id="rank"></ol>
+    </div>
+  </div>
+</section>
+
+<section class="bloque" id="noticias">
+  <header class="sec-h">
+    <span class="marker">la bandeja de discos</span>
+    <h2>Lo que dicen las fuentes</h2>
+    <p>Cada disco es una nota real de donde salió una tendencia. Arrastrá la cascada, usá las flechas o la rueda horizontal. "Leer nota" abre el original y "Ver tendencia" muestra el análisis.</p>
+  </header>
+  <div class="dc">
+    <div class="dc-stage" id="dcStage" tabindex="0" role="region" aria-roledescription="carrusel" aria-label="Notas de las fuentes"><div id="dcDiscs"></div></div>
+    <div class="dc-info">
+      <div class="dc-txt" id="dcTxt" aria-live="polite"></div>
+      <div class="dc-ctrl"><button class="btn" id="dcPrev" type="button" aria-label="Nota anterior">←</button><span id="dcCount"></span><button class="btn" id="dcNext" type="button" aria-label="Nota siguiente">→</button><span class="dc-hint">también con ← → o arrastrando</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="bloque" id="fuentes">
+  <header class="sec-h">
+    <span class="marker">trazabilidad</span>
+    <h2>De dónde sale cada dato</h2>
+    <p>Todas las tendencias, con la nota que las respalda. Hacé clic en el título para abrirla y verificar.</p>
+  </header>
+  <div class="panel">
+    <div class="tabla-wrap">
+      <table>
+        <thead><tr><th>Tendencia</th><th>Horizonte</th><th>Brecha</th><th>Fuente</th><th>Nota original</th><th>Fecha</th></tr></thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<footer class="pie">
+  <p><strong>Cómo se genera:</strong> flujo en n8n que lee feeds RSS de Deezer, Spotify, Music Business Worldwide, Hypebot, Digital Music News y Complete Music Update, filtra notas sobre IA y música, y le pide a un modelo de lenguaje abierto (vía Groq) que extraiga tendencias, horizonte, madurez y brecha. Los resultados se guardan en Google Sheets y este panel los lee de ahí.</p>
+  <p class="credito">Fotos: Unsplash. Cada tendencia usa la imagen principal de su nota cuando está disponible (<code>imagen_url</code>); si no, una foto ilustrativa de su categoría.</p>
+  <p><strong>Límites:</strong> el modelo puede equivocarse o inventar matices; por eso cada fila cita una nota real y verificable. Madurez y brecha (1 a 5) son una valoración del modelo, no una medición. Music Week y The AI Musicpreneur se consultan a mano porque no ofrecen RSS.</p>
+  <div class="estado estado-row" id="estado"></div>
+</footer>
+
+<div class="wm">
+  <canvas id="halftone" role="img" aria-label="SintonIA, en puntos de media tinta"></canvas>
+  <div class="wm-cap"><span>SintonIA news</span><span>Un agente actualiza los datos cada semana</span></div>
+</div>
+
+</div>
+
+<div id="velo"></div>
+<aside id="detalle" role="dialog" aria-modal="true" aria-labelledby="dTitulo"></aside>
+
+<script>
+// ====== CONFIGURACIÓN ======
+// Pegá acá el enlace CSV de la hoja publicada en la web (Archivo > Compartir > Publicar en la web > CSV).
+// Hoja de Google con los datos (debe poder verla "cualquier persona con el enlace").
+// Se lee como script (JSONP), no con fetch: así funciona también al abrir este archivo con doble clic.
+const SHEET_ID = "1bsFhalD6GlcIWmkolUss3QvQ__y9gMNX_GEH7pbAVVQ";
+const SHEET_TAB = "tendencias";
+
+// Datos de respaldo: copia de la hoja (sin duplicados ni notas ajenas a la IA), para que el panel siempre muestre algo.
+const RESPALDO = [
+ {"id":"1p2e1sw","fecha_ejecucion":"2026-11-14","tendencia":"Incremento de litigios por infracción de derechos de autor en música generada por IA","resumen":"La industria está respondiendo con demandas judiciales contra compañías de IA que usan canciones sin licencia.","categoria":"Legal-Regulatorio","horizonte":"Hoy","promedio_industria":"La industria está respondiendo con demandas judiciales contra compañías de IA que usan canciones sin licencia.","potencial":"Podría establecer un sistema de licencias colectivas para el uso de obras en entrenamiento de IA.","brecha":"Existe una gran diferencia entre la acción reactiva de litigar y la necesidad de un marco de licenciamiento proactivo.","brecha_nivel":"4","madurez":"2","fuente_titulo":"Reservoir expands copyright lawsuits against Suno and Anthropic to more than 2,500 songs combined","fuente_url":"https://www.musicbusinessworldwide.com/reservoir-expands-copyright-lawsuits-against-suno-and-anthropic-to-more-than-2500-songs-combined/","fuente_nombre":"Music Business Worldwide","fecha_fuente":"2026-11-13","imagen_url":""},
+ {"id":"1i7lzni","fecha_ejecucion":"2026-11-14","tendencia":"Incertidumbre sobre derechos de uso de catálogos para entrenamiento de IA","resumen":"Las discográficas y plataformas evitan entrenar IA con sus catálogos por la incertidumbre legal.","categoria":"Legal-Regulatorio","horizonte":"Mediano","promedio_industria":"Las discográficas y plataformas evitan entrenar IA con sus catálogos por la incertidumbre legal.","potencial":"Se podrían crear normas claras que definan derechos de uso de catálogos para entrenamiento de IA.","brecha":"La falta de claridad jurídica impide que la industria aproveche el entrenamiento de IA de forma segura.","brecha_nivel":"4","madurez":"2","fuente_titulo":"Getty v Stability ruling could allow AI companies to “offshore” training to circumvent UK copyright law, says BPI","fuente_url":"https://completemusicupdate.com/getty-v-stability-ruling-could-allow-ai-companies-to-offshore-training-to-circumvent-uk-copyright-law-says-bpi/","fuente_nombre":"Complete Music Update","fecha_fuente":"2026-11-13","imagen_url":"https://storage.ghost.io/c/b6/e7/b6e72f7d-e916-4d62-ba8b-51d004f69097/content/images/2026/11/Getty-v-Stablity---1-.png"},
+ {"id":"1hvtwpt","fecha_ejecucion":"2026-11-14","tendencia":"Etiquetado de artistas generados por IA en plataformas de streaming","resumen":"Spotify ya muestra una insignia que identifica a artistas generados por IA.","categoria":"Distribución","horizonte":"Hoy","promedio_industria":"Spotify ya muestra una insignia que identifica a artistas generados por IA.","potencial":"Se adoptarán estándares universales de etiquetado de contenido IA en todas las plataformas.","brecha":"Actualmente solo algunas plataformas etiquetan, lo que genera confusión para usuarios y reguladores.","brecha_nivel":"3","madurez":"3","fuente_titulo":"Spotify AI Persona Badge: What It Means for Artists in 2026","fuente_url":"https://www.hypebot.com/spotify-ai-persona-badge-what-it-means-for-artists-in-2026/","fuente_nombre":"Hypebot","fecha_fuente":"2026-11-13","imagen_url":"https://storage.ghost.io/c/3a/95/3a957c06-c825-4057-9939-0a274cc16d23/content/images/2026/11/Screenshot-2026-11-12-at-10.34.44---AM.png"},
+ {"id":"17cal0e","fecha_ejecucion":"2026-11-14","tendencia":"Herramientas de detección automática de música generada por IA","resumen":"Deezer ha lanzado una herramienta de detección de música IA reconocida internacionalmente.","categoria":"Tecnología","horizonte":"Mediano","promedio_industria":"Deezer ha lanzado una herramienta de detección de música IA reconocida internacionalmente.","potencial":"Todas las plataformas implementarán detección automática y filtros de contenido IA.","brecha":"La detección aún es limitada a pocos servicios, dejando contenido IA sin filtrar en otras plataformas.","brecha_nivel":"3","madurez":"3","fuente_titulo":"Deezer’s AI music detection tool named to TIME’s list of Best Inventions of 2026","fuente_url":"https://newsroom-deezer.com/2026/10/ai-music-detection-time-best-inventions-2026/","fuente_nombre":"Deezer Newsroom","fecha_fuente":"2026-10-15","imagen_url":""},
+ {"id":"1pz29df","fecha_ejecucion":"2026-11-14","tendencia":"Personalización del AI DJ para mejorar la experiencia de consumo","resumen":"Spotify permite a los usuarios personalizar la voz del AI DJ y reducir su charla.","categoria":"Consumo","horizonte":"Hoy","promedio_industria":"Spotify permite a los usuarios personalizar la voz del AI DJ y reducir su charla.","potencial":"Los servicios ofrecerán experiencias de curación totalmente personalizadas mediante IA.","brecha":"La personalización está disponible solo en Spotify y en mercados seleccionados.","brecha_nivel":"2","madurez":"4","fuente_titulo":"Spotify Tweaks AI DJ to Chatter Less with More Voice Options","fuente_url":"https://www.digitalmusicnews.com/2026/11/10/spotify-ai-dj-tweaks-more-voices/","fuente_nombre":"Digital Music News","fecha_fuente":"2026-11-10","imagen_url":"https://www.digitalmusicnews.com/wp-content/uploads/2026/11/spotify-tweaks-ai-dj-to-chatter-less-with-more-voices-1024x576.png"},
+ {"id":"mqs6lw","fecha_ejecucion":"2026-11-14","tendencia":"Importancia de los distribuidores DIY en la protección contra contenido IA","resumen":"Los distribuidores DIY están empezando a ofrecer filtros contra contenido IA infractor.","categoria":"Distribución","horizonte":"Corto","promedio_industria":"Los distribuidores DIY están empezando a ofrecer filtros contra contenido IA infractor.","potencial":"Los distribuidores adoptarán políticas uniformes y herramientas de protección contra IA para todos los lanzamientos.","brecha":"Hay variabilidad en la protección que ofrecen los distribuidores, creando riesgos para los artistas.","brecha_nivel":"3","madurez":"2","fuente_titulo":"Why Choosing the Right DIY Music Distributor Will Matter More Than Ever in 2027","fuente_url":"https://www.digitalmusicnews.com/2026/11/11/choosing-the-right-diy-music-distribution/","fuente_nombre":"Digital Music News","fecha_fuente":"2026-11-12","imagen_url":"https://www.digitalmusicnews.com/wp-content/uploads/2026/11/dee-XhvEvfXQoSY-unsplash-1024x683.jpg"},
+ {"id":"572vgf","fecha_ejecucion":"2026-11-14","tendencia":"Financiación y asesoría especializada para proyectos de música IA","resumen":"beatBread ha creado un consejo asesor con ejecutivos de Meta y Suno para explorar financiación AI.","categoria":"Mercado","horizonte":"Hoy","promedio_industria":"beatBread ha creado un consejo asesor con ejecutivos de Meta y Suno para explorar financiación AI.","potencial":"Se crearán productos financieros específicos para proyectos de música generada por IA.","brecha":"Actualmente la financiación AI es escasa y poco estructurada.","brecha_nivel":"2","madurez":"3","fuente_titulo":"beatBread forms advisory board including executives from Meta and Suno","fuente_url":"https://www.musicbusinessworldwide.com/beatbread-forms-advisory-board-including-executives-from-meta-and-suno/","fuente_nombre":"Music Business Worldwide","fecha_fuente":"2026-11-12","imagen_url":""},
+ {"id":"50yxq7","fecha_ejecucion":"2026-11-14","tendencia":"Integración de tecnología visual inmersiva en eventos en vivo","resumen":"Yamaha ha adquirido Disguise, ampliando su presencia en tecnología visual para eventos en vivo.","categoria":"Creación","horizonte":"Mediano","promedio_industria":"Yamaha ha adquirido Disguise, ampliando su presencia en tecnología visual para eventos en vivo.","potencial":"Los conciertos incorporarán experiencias inmersivas de realidad aumentada y producción virtual como norma.","brecha":"La integración visual todavía es limitada a eventos de gran escala.","brecha_nivel":"3","madurez":"2","fuente_titulo":"Yamaha Acquires Disguise from Carlyle to Grab a Bigger Piece of Live Events","fuente_url":"https://www.digitalmusicnews.com/2026/11/13/yamaha-corporation-to-acquire-disguise/","fuente_nombre":"Digital Music News","fecha_fuente":"2026-11-13","imagen_url":"https://www.digitalmusicnews.com/wp-content/uploads/2026/11/yamaha-corporation-to-acquire-disguise-1024x576.png"},
+ {"id":"13vti58","fecha_ejecucion":"2026-11-14","tendencia":"Expansión de contenido hablado (audiolibros) en plataformas de música","resumen":"Spotify ha añadido el catálogo de Scholastic en formato audiolibro para sus suscriptores premium.","categoria":"Consumo","horizonte":"Hoy","promedio_industria":"Spotify ha añadido el catálogo de Scholastic en formato audiolibro para sus suscriptores premium.","potencial":"Las plataformas de streaming se convertirán en hubs de audio que incluyen música, podcasts y audiolibros.","brecha":"El contenido hablado aún está segmentado y no integrado plenamente con la experiencia musical.","brecha_nivel":"2","madurez":"4","fuente_titulo":"Scholastic’s Catalog Is Now Available on Audiobooks in Premium","fuente_url":"https://newsroom.spotify.com/2026-11-10/scholastic-audiobooks-in-premium/","fuente_nombre":"Spotify Newsroom","fecha_fuente":"2026-11-10","imagen_url":""},
+ {"id":"cvxfwf","fecha_ejecucion":"2026-11-14","tendencia":"Adopción de audio de alta resolución sin coste extra","resumen":"Deezer HiFi ofrece streaming lossless hasta 24‑bit/192 kHz sin coste extra para usuarios elegibles.","categoria":"Distribución","horizonte":"Hoy","promedio_industria":"Deezer HiFi ofrece streaming lossless hasta 24‑bit/192 kHz sin coste extra para usuarios elegibles.","potencial":"El streaming de alta resolución será estándar en todas las suscripciones premium.","brecha":"Solo algunos usuarios y plataformas disponen de audio lossless, limitando su adopción masiva.","brecha_nivel":"3","madurez":"3","fuente_titulo":"Deezer HiFi goes up to 24-bit/192 kHz!","fuente_url":"https://newsroom-deezer.com/2026/10/deezer-hifi-goes-up-to-24-bit-192-khz/","fuente_nombre":"Deezer Newsroom","fecha_fuente":"2026-10-14","imagen_url":""},
+ {"id":"1e2tk57","fecha_ejecucion":"2026-11-14","tendencia":"Nuevos acuerdos de merchandising entre música y cine","resumen":"Bravado y Searchlight Pictures han iniciado una colaboración de merchandising, primera entre UMG y una productora de cine.","categoria":"Mercado","horizonte":"Corto","promedio_industria":"Bravado y Searchlight Pictures han iniciado una colaboración de merchandising, primera entre UMG y una productora de cine.","potencial":"Se multiplicarán los acuerdos de merchandising entre la música y otras industrias de entretenimiento.","brecha":"Los acuerdos de merchandising siguen siendo esporádicos y poco estructurados.","brecha_nivel":"3","madurez":"2","fuente_titulo":"Searchlight Pictures Taps UMG-Owned Bravado for Merchandising","fuente_url":"https://www.digitalmusicnews.com/2026/11/13/searchlight-taps-umg-owned-bravado-for-merchandising/","fuente_nombre":"Digital Music News","fecha_fuente":"2026-11-13","imagen_url":"https://www.digitalmusicnews.com/wp-content/uploads/2026/11/searchlight-taps-umg-owned-bravado-for-merchandising-1024x576.png"},
+ {"id":"1wqnwf2","fecha_ejecucion":"2026-11-14","tendencia":"Proyección: Licencias colectivas para el entrenamiento de IA en música","resumen":"Proyección: A largo plazo, la industria adoptará licencias colectivas específicas para el entrenamiento de IA, permitiendo a los creadores recibir compensación por el uso de sus obras en modelos generativos.","categoria":"Legal-Regulatorio","horizonte":"Largo","promedio_industria":"Actualmente la industria depende de litigios y acuerdos ad hoc para gestionar el uso de obras en IA.","potencial":"Un esquema de licencias colectivas garantizará ingresos continuos y reducirá la incertidumbre legal.","brecha":"Hay una brecha profunda entre la ausencia de un marco de licenciamiento y la necesidad de uno para el futuro de la IA.","brecha_nivel":"5","madurez":"1","fuente_titulo":"The UMG v. Suno Discovery Dispute Rages On — Now, Suno Is Questioning Whether the Majors ‘Have the Rights’ to License Their Catalogs for Training","fuente_url":"https://www.digitalmusicnews.com/2026/11/10/umg-v-suno-discovery-dispute/","fuente_nombre":"Digital Music News","fecha_fuente":"2026-11-11","imagen_url":"https://www.digitalmusicnews.com/wp-content/uploads/2026/04/JJMC-1024x546.jpg"},
+ {"id":"1k9k8nl","fecha_ejecucion":"2026-11-14","tendencia":"Proyección: Reformas legislativas para proteger derechos de autores frente a la IA","resumen":"Proyección: En los próximos años, legisladores aprobarán leyes que protegerán los derechos de autor y de imagen de los artistas frente a la IA, estableciendo obligaciones de atribución y reparto de ingresos.","categoria":"Legal-Regulatorio","horizonte":"Largo","promedio_industria":"Hoy la regulación es fragmentaria y depende de decisiones judiciales.","potencial":"Una legislación clara asegurará que los creadores reciban remuneración y control sobre el uso de su identidad en IA.","brecha":"La falta de normativa uniforme crea incertidumbre y vulnerabilidad para los artistas.","brecha_nivel":"5","madurez":"1","fuente_titulo":"The ‘Blue Wave’ Could Change the Rules for Music AI","fuente_url":"https://www.digitalmusicnews.com/2026/11/10/blue-wave-change-rules-for-music-ai/","fuente_nombre":"Digital Music News","fecha_fuente":"2026-11-11","imagen_url":"https://www.digitalmusicnews.com/wp-content/uploads/2026/11/A-historic-blue-wave-has-broken-across-the-United-States.-Is-there-an-opportunity-for-musicians-1024x576.png"}
+];
+
+// ====== CONSTANTES ======
+const HORIZONTES = ["Hoy","Corto","Mediano","Largo"];
+const RANGO = {Hoy:"Ya está ocurriendo", Corto:"0 a 12 meses", Mediano:"1 a 3 años", Largo:"Más de 3 años"};
+const CATEGORIAS = ["Tecnología","Mercado","Legal-Regulatorio","Creación","Distribución","Consumo"];
+const HVAR = {Hoy:"--h-hoy", Corto:"--h-corto", Mediano:"--h-mediano", Largo:"--h-largo"};
+const HLETRA = {Hoy:"H", Corto:"C", Mediano:"M", Largo:"L"};
+
+// Fotos ilustrativas por categoría (Unsplash). Si falla la carga, queda el degradado de fondo.
+const FOTO_ID = {
+  "Tecnología": "1598488035139-bdbb2231ce04",
+  "Mercado": "1526628953301-3e589a6a8b74",
+  "Legal-Regulatorio": "1589829545856-d10d557cf95f",
+  "Creación": "1511671782779-c97d3d27a1d4",
+  "Distribución": "1470225620780-dba8ba36b745",
+  "Consumo": "1493225457124-a3eb161ffa5f"
+};
+const FOTO_HERO = "1478737270239-2f02b77fc618";
+const foto = (r, w) => (r && r.imagen_url) || `https://images.unsplash.com/photo-${FOTO_ID[r && r.categoria] || FOTO_HERO}?auto=format&fit=crop&w=${w}&q=70`;
+// si una imagen no carga, se quita y se ve el degradado
+document.addEventListener("error", (e) => { if (e.target.tagName === "IMG") e.target.remove(); }, true);
+
+let todas = [];
+let filtroCat = "Todas";
+let origen = {vivo:false, mensaje:""};
+
+// ====== UTILIDADES ======
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const cssVar = (n) => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+function fecha(s) {
+  const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(s || "");
+  if (!m) return s || "";
+  return new Date(+m[1], +m[2]-1, +m[3]).toLocaleDateString("es-AR", {day:"numeric", month:"short", year:"numeric"});
+}
+function normCat(c) {
+  const s = String(c || "").toLowerCase().trim();
+  return CATEGORIAS.find(x => x.toLowerCase() === s)
+    || CATEGORIAS.find(x => s && (x.toLowerCase().startsWith(s.slice(0,5)) || s.startsWith(x.toLowerCase().slice(0,5))))
+    || "Mercado";
+}
+function parseCSV(text) {
+  const rows = []; let row = [], cur = "", q = false;
+  for (let i = 0; i < text.length; i++) {
+    const ch = text[i];
+    if (q) {
+      if (ch === '"') { if (text[i+1] === '"') { cur += '"'; i++; } else q = false; }
+      else cur += ch;
+    } else if (ch === '"') q = true;
+    else if (ch === ",") { row.push(cur); cur = ""; }
+    else if (ch === "\n") { row.push(cur); rows.push(row); row = []; cur = ""; }
+    else if (ch !== "\r") cur += ch;
+  }
+  if (cur !== "" || row.length) { row.push(cur); rows.push(row); }
+  return rows;
+}
+function limpiar(lista) {
+  const porId = new Map();
+  for (const r of lista) {
+    const o = {
+      id: String(r.id || "").trim(),
+      fecha_ejecucion: r.fecha_ejecucion || "",
+      tendencia: (r.tendencia || "").trim(),
+      resumen: r.resumen || "",
+      categoria: normCat(r.categoria),
+      horizonte: HORIZONTES.includes(r.horizonte) ? r.horizonte : "Hoy",
+      promedio_industria: r.promedio_industria || "",
+      potencial: r.potencial || "",
+      brecha: r.brecha || "",
+      brecha_nivel: Math.min(5, Math.max(1, parseInt(r.brecha_nivel, 10) || 1)),
+      madurez: Math.min(5, Math.max(1, parseInt(r.madurez, 10) || 1)),
+      fuente_titulo: r.fuente_titulo || "",
+      fuente_url: r.fuente_url || "",
+      fuente_nombre: r.fuente_nombre || "",
+      fecha_fuente: r.fecha_fuente || "",
+      imagen_url: /^https?:\/\//.test((r.imagen_url || "").trim()) ? r.imagen_url.trim() : ""
+    };
+    if (!o.tendencia) continue;
+    porId.set(o.id || o.tendencia, o); // si el id se repite (reejecuciones), queda la fila más reciente
+  }
+  // Cada corrida del agente repite temas con otros títulos; el panel muestra solo la corrida más reciente.
+  const todas = [...porId.values()];
+  const ultima = todas.map(r => r.fecha_ejecucion).sort().pop();
+  return todas.filter(r => r.fecha_ejecucion === ultima);
+}
+const visibles = () => filtroCat === "Todas" ? todas : todas.filter(r => r.categoria === filtroCat);
+const meter = (n) => `<span class="meter" aria-label="Brecha ${n} de 5" role="img">${[1,2,3,4,5].map(i => `<i class="${i <= n ? "on" : ""}"></i>`).join("")}</span>`;
+
+// ====== CARGA DE DATOS ======
+// Lee la hoja con la API de visualización de Google como <script>: los scripts no pasan por CORS.
+function leerHoja() {
+  return new Promise((resolve, reject) => {
+    const cb = "__sintonia" + Date.now();
+    const s = document.createElement("script");
+    let t = 0;
+    const fin = () => { clearTimeout(t); delete window[cb]; s.remove(); };
+    t = setTimeout(() => { fin(); reject(new Error("la hoja no respondió; ¿está compartida con el enlace?")); }, 12000);
+    window[cb] = (resp) => {
+      fin();
+      if (!resp || resp.status !== "ok") return reject(new Error((resp && resp.errors && resp.errors[0] && resp.errors[0].message) || "respuesta inválida"));
+      const cols = resp.table.cols.map(c => c.label);
+      resolve(resp.table.rows.map(r => Object.fromEntries(cols.map((h, i) => {
+        const c = r.c[i];
+        const esFecha = c && typeof c.v === "string" && c.v.startsWith("Date(");
+        return [h, c == null || c.v == null ? "" : (esFecha && c.f ? c.f : c.v)];
+      }))));
+    };
+    s.onerror = () => { fin(); reject(new Error("no se pudo cargar el script de Google")); };
+    s.src = "https://docs.google.com/spreadsheets/d/" + SHEET_ID + "/gviz/tq?tqx=out:json;responseHandler:" + cb +
+      "&sheet=" + encodeURIComponent(SHEET_TAB) + "&headers=1&_=" + Date.now();
+    document.head.appendChild(s);
+  });
+}
+async function cargar(forzar) {
+  let lista = null;
+  if (SHEET_ID) {
+    try {
+      lista = limpiar(await leerHoja());
+      if (!lista.length) throw new Error("La hoja no tiene filas");
+      origen = {vivo: true, mensaje: "Datos en vivo desde Google Sheets"};
+    } catch (e) {
+      lista = null;
+      origen = {vivo: false, mensaje: "No se pudo leer la hoja (" + e.message + "). Se muestra la última copia guardada."};
+    }
+  } else {
+    origen = {vivo: false, mensaje: "Sin hoja conectada. Se muestran datos de respaldo."};
+  }
+  todas = lista || limpiar(RESPALDO);
+  dibujar();
+}
+
+// ====== DIBUJO ======
+function dibujarEstado() {
+  const ult = todas.map(r => r.fecha_ejecucion).sort().pop();
+  $("estado").innerHTML =
+    `<span class="pill ${origen.vivo ? "" : "warn"}">${origen.vivo ? "● " : "⚠ "}${esc(origen.mensaje)}</span>` +
+    (ult ? `<span>Última corrida del agente: ${esc(fecha(ult))}</span>` : "") +
+    `<button class="btn" id="btnAct" type="button">Actualizar datos</button>`;
+  $("btnAct").onclick = () => cargar(true);
+}
+function dibujarFiltro() {
+  const cats = CATEGORIAS.filter(c => todas.some(r => r.categoria === c));
+  const sel = $("fCat");
+  sel.innerHTML = ["Todas", ...cats].map(c => `<option ${c === filtroCat ? "selected" : ""}>${esc(c)}</option>`).join("");
+  sel.onchange = () => { filtroCat = sel.value; dibujar(); };
+}
+function dibujarPreguntas() {
+  const v = visibles();
+  const hoy = v.filter(r => r.horizonte === "Hoy").length, fut = v.length - hoy;
+  const prom = v.length ? (v.reduce((a, r) => a + r.brecha_nivel, 0) / v.length).toFixed(1).replace(".", ",") : "–";
+  const fuentes = new Set(v.map(r => r.fuente_nombre)).size;
+  $("preguntas").innerHTML = [
+    ["#hoy", "01", "¿Qué pasa hoy?", `${hoy} de ${v.length} tendencias ya están ocurriendo`],
+    ["#futuro", "02", "¿Qué puede venir?", `${fut} proyecciones a corto, mediano y largo plazo`],
+    ["#brechas", "03", "¿Dónde están las brechas?", `Brecha promedio ${prom} / 5 · ${fuentes} fuentes`]
+  ].map(([h, n, q, m]) => `<a class="pq" href="${h}"><span class="pq-n">${n}</span><span class="pq-q">${esc(q)}</span><span class="pq-m">${esc(m)}</span><span class="pq-a" aria-hidden="true">↓</span></a>`).join("");
+}
+function tarjeta(r) {
+  return `<button class="card" type="button" data-id="${esc(r.id || r.tendencia)}">
+    <div class="foto"><img src="${esc(foto(r, 560))}" alt="" loading="lazy"><span class="chip" data-h="${r.horizonte}">${r.horizonte}</span><span class="tag">${esc(r.categoria)}</span></div>
+    <div class="cb">
+      <h3>${esc(r.tendencia)}</h3>
+      <p class="txt">${esc(r.promedio_industria)}</p>
+      <div class="meta">${meter(r.brecha_nivel)}<span class="more">Ver detalle →</span></div>
+    </div>
+  </button>`;
+}
+function dibujarHoy() {
+  const v = visibles();
+  const hoy = v.filter(r => r.horizonte === "Hoy");
+  $("cardsHoy").innerHTML = hoy.length ? hoy.map(tarjeta).join("") : `<p class="vacio">No hay tendencias de hoy en esta categoría.</p>`;
+  const cuenta = CATEGORIAS.map(c => [c, hoy.filter(r => r.categoria === c).length]).filter(x => x[1] > 0).sort((a, b) => b[1] - a[1]);
+  const max = Math.max(1, ...cuenta.map(x => x[1]));
+  $("barrasCat").innerHTML = cuenta.length
+    ? cuenta.map(([c, n]) => `<div class="barra"><span>${esc(c)}</span><div class="pista"><div class="rell" style="width:${n / max * 100}%"></div></div><span class="n">${n}</span></div>`).join("")
+    : `<p class="vacio">Sin datos.</p>`;
+}
+function dibujarFuturo() {
+  const v = visibles();
+  $("cols").innerHTML = ["Corto","Mediano","Largo"].map(h => {
+    const items = v.filter(r => r.horizonte === h);
+    return `<div class="col">
+      <header><span class="chip" data-h="${h}">${h} plazo</span><span class="rango">${RANGO[h]} · ${items.length}</span></header>
+      ${items.length ? items.map(tarjeta).join("") : `<p class="vacio">${h === "Largo" ? "Ninguna fuente de esta corrida da señales claras a más de 3 años. Es una limitación del recorte, no una ausencia de futuro." : "Sin tendencias en este plazo para el filtro elegido."}</p>`}
+    </div>`;
+  }).join("");
+}
+function dibujarRank() {
+  const top = [...visibles()].sort((a, b) => b.brecha_nivel - a.brecha_nivel || a.madurez - b.madurez).slice(0, 6);
+  $("rank").innerHTML = top.map(r => `<li><button type="button" data-id="${esc(r.id || r.tendencia)}">
+    <img class="thumb" src="${esc(foto(r, 120))}" alt="" loading="lazy">
+    <span class="tx"><span class="t">${esc(r.tendencia)}</span>
+    <span class="r">${meter(r.brecha_nivel)}<span class="chip" data-h="${r.horizonte}">${r.horizonte}</span></span></span>
+  </button></li>`).join("") || `<p class="vacio">Sin datos.</p>`;
+}
+function dibujarScatter() {
+  const W = 640, H = 430, L = 62, R = 14, T = 14, B = 64;
+  const pw = W - L - R, ph = H - T - B, cw = pw / 5, ch = ph / 5;
+  const cx = (m) => L + (m - 0.5) * cw, cy = (b) => T + (5.5 - b) * ch;
+  const grid = cssVar("--grid"), axis = cssVar("--axis"), ink2 = cssVar("--ink-2"), ink3 = cssVar("--ink-3"), surf = cssVar("--surface");
+  let s = "";
+  for (let i = 0; i <= 5; i++) {
+    s += `<line x1="${L}" x2="${L + pw}" y1="${T + i * ch}" y2="${T + i * ch}" stroke="${grid}"/>`;
+    s += `<line y1="${T}" y2="${T + ph}" x1="${L + i * cw}" x2="${L + i * cw}" stroke="${grid}"/>`;
+  }
+  s += `<line x1="${L}" x2="${L + pw}" y1="${T + ph}" y2="${T + ph}" stroke="${axis}"/><line x1="${L}" x2="${L}" y1="${T}" y2="${T + ph}" stroke="${axis}"/>`;
+  for (let i = 1; i <= 5; i++) {
+    s += `<text x="${cx(i)}" y="${T + ph + 18}" text-anchor="middle" font-size="12" fill="${ink2}">${i}</text>`;
+    s += `<text x="${L - 10}" y="${cy(i) + 4}" text-anchor="end" font-size="12" fill="${ink2}">${i}</text>`;
+  }
+  s += `<text x="${L}" y="${T + ph + 38}" font-size="12" fill="${ink3}">Emergente</text>`;
+  s += `<text x="${L + pw}" y="${T + ph + 38}" text-anchor="end" font-size="12" fill="${ink3}">Consolidada</text>`;
+  s += `<text x="${L + pw / 2}" y="${T + ph + 56}" text-anchor="middle" font-size="12.5" fill="${ink2}">Madurez de la tendencia</text>`;
+  s += `<text transform="translate(14 ${T + ph / 2}) rotate(-90)" text-anchor="middle" font-size="12.5" fill="${ink2}">Tamaño de la brecha</text>`;
+  s += `<text x="${L + 8}" y="${T + 16}" font-size="11.5" fill="${ink3}">Brecha grande, poco madura</text>`;
+  s += `<text x="${L + pw - 8}" y="${T + ph - 8}" text-anchor="end" font-size="11.5" fill="${ink3}">Brecha chica, ya madura</text>`;
+
+  const grupos = new Map();
+  visibles().forEach(r => { const k = r.madurez + "_" + r.brecha_nivel; (grupos.get(k) || grupos.set(k, []).get(k)).push(r); });
+  grupos.forEach(lista => {
+    const n = lista.length, cols = Math.ceil(Math.sqrt(n)), filas = Math.ceil(n / cols), paso = 26;
+    lista.forEach((r, i) => {
+      const c = i % cols, f = Math.floor(i / cols);
+      const x = cx(r.madurez) + (c - (cols - 1) / 2) * paso;
+      const y = cy(r.brecha_nivel) + (f - (filas - 1) / 2) * paso;
+      const fill = cssVar(HVAR[r.horizonte]);
+      const txt = r.horizonte === "Hoy" ? cssVar("--h-hoy-ink") : "#ffffff";
+      s += `<g class="pt" tabindex="0" role="button" data-id="${esc(r.id || r.tendencia)}" aria-label="${esc(r.tendencia)}. Horizonte ${r.horizonte}. Madurez ${r.madurez}, brecha ${r.brecha_nivel}." style="cursor:pointer">
+        <circle cx="${x}" cy="${y}" r="11.5" fill="${fill}" stroke="${surf}" stroke-width="2"/>
+        <text x="${x}" y="${y + 4}" text-anchor="middle" font-size="11" font-weight="700" fill="${txt}" pointer-events="none">${HLETRA[r.horizonte]}</text>
+      </g>`;
+    });
+  });
+  $("scatter").innerHTML = s;
+  $("leyenda").innerHTML = HORIZONTES.map(h => `<span><span class="sw" style="background:var(${HVAR[h]})"></span>${HLETRA[h]} = ${h}</span>`).join("");
+
+  const tip = $("tip"), wrap = $("scatterWrap");
+  const find = (id) => todas.find(r => (r.id || r.tendencia) === id);
+  document.querySelectorAll("#scatter .pt").forEach(g => {
+    const r = find(g.dataset.id);
+    const mostrar = (e) => {
+      const b = wrap.getBoundingClientRect(), p = g.getBoundingClientRect();
+      tip.innerHTML = `<strong>${esc(r.tendencia)}</strong><br>${r.horizonte} · madurez ${r.madurez} · brecha ${r.brecha_nivel}`;
+      tip.style.left = (p.left + p.width / 2 - b.left) + "px";
+      tip.style.top = (p.top - b.top) + "px";
+      tip.classList.add("on");
+    };
+    g.addEventListener("mouseenter", mostrar);
+    g.addEventListener("focus", mostrar);
+    g.addEventListener("mouseleave", () => tip.classList.remove("on"));
+    g.addEventListener("blur", () => tip.classList.remove("on"));
+    g.addEventListener("click", () => abrir(r));
+    g.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); abrir(r); } });
+  });
+}
+function dibujarTabla() {
+  const v = [...visibles()].sort((a, b) => HORIZONTES.indexOf(a.horizonte) - HORIZONTES.indexOf(b.horizonte) || b.brecha_nivel - a.brecha_nivel);
+  $("tbody").innerHTML = v.map(r => `<tr>
+    <td>${esc(r.tendencia)}</td>
+    <td><span class="chip" data-h="${r.horizonte}">${r.horizonte}</span></td>
+    <td>${meter(r.brecha_nivel)}</td>
+    <td>${esc(r.fuente_nombre)}</td>
+    <td>${r.fuente_url ? `<a href="${esc(r.fuente_url)}" target="_blank" rel="noopener">${esc(r.fuente_titulo || r.fuente_url)}</a>` : esc(r.fuente_titulo)}</td>
+    <td>${esc(fecha(r.fecha_fuente))}</td>
+  </tr>`).join("");
+}
+function enlazarClics() {
+  document.querySelectorAll("[data-id]").forEach(el => {
+    if (el.classList.contains("pt")) return;
+    el.onclick = () => abrir(todas.find(r => (r.id || r.tendencia) === el.dataset.id));
+  });
+}
+// ---- portada: collage grunge, ficha rotativa y cinta de noticias ----
+const HERO_FOTOS = {main: "1498038432885-c6f3f1b912ee", vinilo: "1603048588665-791ca8aea617", neon: "1508700115892-45ecd05ae2ad"};
+const unsp = (id, w) => `https://images.unsplash.com/photo-${id}?auto=format&fit=crop&w=${w}&q=70`;
+let heroTimer = null;
+function dibujarHero() {
+  const v = [...visibles()].sort((a, b) => b.brecha_nivel - a.brecha_nivel || a.madurez - b.madurez);
+  const top = v.slice(0, 4);
+  const ult = todas.map(r => r.fecha_ejecucion).sort().pop();
+  $("pFecha").textContent = ult ? "edición del " + fecha(ult) : "";
+  const fuentes = [...new Set(todas.map(r => r.fuente_nombre).filter(Boolean))];
+  $("heroSrc").innerHTML = fuentes.length ? `<b>Sintonizamos:</b>` + fuentes.slice(0, 6).map(n => `<span>${esc(n)}</span>`).join("") : "";
+  const nombres = [...new Set(v.map(r => r.tendencia))];
+  const chunk = nombres.map(t => `<span>${esc(t)}</span><i>✺</i>`).join("").repeat(nombres.length >= 8 ? 1 : 3);
+  $("marq").innerHTML = chunk + chunk;
+  clearInterval(heroTimer);
+  const F = $("ficha");
+  if (!top.length) { F.innerHTML = ""; F.style.display = "none"; return; }
+  F.style.display = "";
+  let idx = 0;
+  const show = (i) => {
+    idx = i;
+    const r = top[i];
+    F.innerHTML = `<span class="marker">brecha destacada · ${esc(r.categoria)}</span>
+      <strong>${esc(r.tendencia)}</strong>
+      <p>${esc(r.brecha)}</p>
+      <div class="f-pie">${meter(r.brecha_nivel)}<button class="btn" type="button" id="gBtn">Ver detalle →</button></div>
+      <div class="f-dots" role="group" aria-label="Brechas destacadas">${top.map((_, k) => `<button type="button" class="dot" aria-label="Brecha destacada ${k + 1}" aria-current="${k === i}"></button>`).join("")}</div>`;
+    F.classList.remove("sw"); void F.offsetWidth; F.classList.add("sw");
+    $("gBtn").onclick = () => abrir(top[idx]);
+    F.querySelectorAll(".dot").forEach((d, k) => d.onclick = () => { show(k); auto(); });
+  };
+  const auto = () => {
+    clearInterval(heroTimer);
+    if (top.length > 1 && !(window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches))
+      heroTimer = setInterval(() => show((idx + 1) % top.length), 7000);
+  };
+  show(0); auto();
+}
+
+// ---- carpetas por tema: eligen una categoría y muestran sus tendencias debajo ----
+const FOLD_COL = {"Tecnología": "#8fb4ff", "Mercado": "#ffd23f", "Legal-Regulatorio": "#ff8a6b", "Creación": "#ffa8c8", "Distribución": "#ffb454", "Consumo": "#8fd9a8"};
+let carpeta = null;
+function dibujarCarpetas() {
+  const v = visibles();
+  const cats = CATEGORIAS.filter(c => v.some(r => r.categoria === c));
+  const cuenta = (c) => v.filter(r => r.categoria === c).length;
+  if (!cats.includes(carpeta)) carpeta = [...cats].sort((a, b) => cuenta(b) - cuenta(a))[0] || null;
+  $("folds").innerHTML = cats.map(c => {
+    const n = cuenta(c);
+    return `<button class="fold" type="button" data-c="${esc(c)}" aria-pressed="${c === carpeta}" style="--fc:${FOLD_COL[c]}">
+      <span class="fold-tab"></span><span class="fold-back"></span>
+      <span class="fold-pic"><img src="${esc(foto({categoria: c}, 320))}" alt="" loading="lazy"></span>
+      <span class="fold-lid"><span class="fold-n">${esc(c)}</span><span class="fold-c">${n} ${n === 1 ? "tendencia" : "tendencias"}</span></span>
+    </button>`;
+  }).join("");
+  const items = v.filter(r => r.categoria === carpeta).sort((a, b) => b.brecha_nivel - a.brecha_nivel || a.madurez - b.madurez);
+  const P = $("foldPanel");
+  P.style.setProperty("--fcc", FOLD_COL[carpeta] || "var(--c1)");
+  P.style.display = items.length ? "" : "none";
+  P.innerHTML = items.length ? `<header><h3>${esc(carpeta)}</h3><span>${items.length} ${items.length === 1 ? "tendencia" : "tendencias"}, de mayor a menor brecha</span></header>
+    <div class="minis">${items.map(r => `<button class="mini" type="button" data-id="${esc(r.id || r.tendencia)}">
+      <img src="${esc(foto(r, 240))}" alt="" loading="lazy">
+      <span class="mt"><span class="mh">${esc(r.tendencia)}</span><span class="meta"><span class="chip" data-h="${r.horizonte}">${r.horizonte}</span>${meter(r.brecha_nivel)}</span></span>
+    </button>`).join("")}</div>` : "";
+  document.querySelectorAll("#folds .fold").forEach(b => b.onclick = () => {
+    carpeta = b.dataset.c; dibujarCarpetas(); enlazarClics();
+    const nb = document.querySelector(`#folds .fold[data-c="${CSS.escape(carpeta)}"]`);
+    if (nb) nb.focus();
+  });
+}
+
+// ---- wordmark en media tinta (halftone) ----
+let htCov = null, htGeom = null, htMouse = null, htRaf = 0;
+function prepararHalftone() {
+  const cv = $("halftone"), box = cv.parentElement;
+  const W = Math.max(300, box.clientWidth);
+  const step = W < 600 ? 7 : 10, cols = Math.floor(W / step), hi = 4, texto = "SINTONIA";
+  const meas = document.createElement("canvas").getContext("2d");
+  meas.font = "800 100px Sora, system-ui, sans-serif";
+  const fontPx = 100 * (cols * hi * 0.98) / meas.measureText(texto).width;
+  const rowsHi = Math.round(fontPx * 0.86), rows = Math.ceil(rowsHi / hi);
+  const off = document.createElement("canvas"); off.width = cols * hi; off.height = rows * hi;
+  const o = off.getContext("2d", {willReadFrequently: true});
+  o.fillStyle = "#fff"; o.font = `800 ${fontPx}px Sora, system-ui, sans-serif`; o.textAlign = "center"; o.textBaseline = "alphabetic";
+  o.fillText(texto, off.width / 2, (rows * hi + fontPx * 0.72) / 2);
+  const px = o.getImageData(0, 0, off.width, off.height).data;
+  htCov = new Float32Array(cols * rows);
+  for (let y = 0; y < rows; y++) for (let x = 0; x < cols; x++) {
+    let s = 0;
+    for (let j = 0; j < hi; j++) for (let i = 0; i < hi; i++) s += px[(((y * hi + j) * off.width) + (x * hi + i)) * 4 + 3];
+    htCov[y * cols + x] = s / (hi * hi * 255);
+  }
+  const dpr = Math.min(2, window.devicePixelRatio || 1);
+  cv.width = Math.round(cols * step * dpr); cv.height = Math.round(rows * step * dpr);
+  cv.style.height = (rows * step * (W / (cols * step))) + "px";
+  htGeom = {cols, rows, step, dpr};
+  dibujarHalftone();
+}
+function dibujarHalftone() {
+  htRaf = 0;
+  if (!htCov) return;
+  const cv = $("halftone"), c = cv.getContext("2d"), {cols, rows, step, dpr} = htGeom;
+  c.setTransform(dpr, 0, 0, dpr, 0, 0);
+  c.clearRect(0, 0, cols * step, rows * step);
+  const g = c.createLinearGradient(0, 0, cols * step, 0);
+  g.addColorStop(0, cssVar("--accent")); g.addColorStop(1, cssVar("--gap"));
+  const tex = cssVar("--axis");
+  for (let y = 0; y < rows; y++) for (let x = 0; x < cols; x++) {
+    const cx = x * step + step / 2, cy = y * step + step / 2, cov = htCov[y * cols + x];
+    let boost = 1;
+    if (htMouse) { const d = Math.hypot(cx - htMouse.x, cy - htMouse.y); if (d < 110) boost = 1 + (1 - d / 110) * 0.55; }
+    if (cov > 0.05) { c.fillStyle = g; c.beginPath(); c.arc(cx, cy, Math.min(step * 0.62, step * 0.52 * Math.sqrt(cov) * boost), 0, 6.2832); c.fill(); }
+    else { c.fillStyle = tex; c.globalAlpha = htMouse && boost > 1 ? 0.9 : 0.55; c.beginPath(); c.arc(cx, cy, 0.9 * boost, 0, 6.2832); c.fill(); c.globalAlpha = 1; }
+  }
+}
+function iniciarHalftone() {
+  const cv = $("halftone"), box = cv.parentElement;
+  const listo = (document.fonts && document.fonts.load) ? document.fonts.load("800 100px Sora").catch(() => {}) : Promise.resolve();
+  listo.then(prepararHalftone);
+  let t = 0;
+  if ("ResizeObserver" in window) new ResizeObserver(() => { clearTimeout(t); t = setTimeout(prepararHalftone, 150); }).observe(box);
+  cv.addEventListener("pointermove", (e) => {
+    if (!htGeom) return;
+    const b = cv.getBoundingClientRect(), s = (htGeom.cols * htGeom.step) / b.width;
+    htMouse = {x: (e.clientX - b.left) * s, y: (e.clientY - b.top) * s};
+    if (!htRaf) htRaf = requestAnimationFrame(dibujarHalftone);
+  });
+  cv.addEventListener("pointerleave", () => { htMouse = null; if (!htRaf) htRaf = requestAnimationFrame(dibujarHalftone); });
+}
+
+
+// ---- discos en cascada: una nota por disco ----
+const dc = {pos: 0, target: 0, N: 0, D: 320, off: 86, raf: 0, active: -1, listos: false, drag: null, notas: []};
+const HC = {Hoy: "var(--h-hoy)", Corto: "var(--h-corto)", Mediano: "var(--h-mediano)", Largo: "var(--h-largo)"};
+function dcGeom() {
+  const st = $("dcStage");
+  dc.D = Math.max(180, Math.min(360, st.clientWidth * 0.52, st.clientHeight * 0.9));
+  dc.off = dc.D * 0.27;
+  st.style.setProperty("--D", dc.D + "px");
+}
+function dcInfo(i) {
+  const r = dc.notas[i];
+  if (!r) return;
+  $("dcCount").textContent = String(i + 1).padStart(2, "0") + " / " + String(dc.N).padStart(2, "0");
+  $("dcTxt").innerHTML = `<span class="dc-src">${esc(r.fuente_nombre)} · ${esc(fecha(r.fecha_fuente))}</span>
+    <h3>${esc(r.fuente_titulo || r.tendencia)}</h3>
+    <p class="dc-tr"><span class="chip" data-h="${r.horizonte}">${r.horizonte}</span> Tendencia: ${esc(r.tendencia)}</p>
+    <div class="dc-act">${r.fuente_url ? `<a class="zbtn sm" href="${esc(r.fuente_url)}" target="_blank" rel="noopener">Leer nota ↗</a>` : ""}<button class="zbtn sm ghost" type="button" id="dcVer">Ver tendencia</button></div>`;
+  $("dcVer").onclick = () => abrir(r);
+}
+function dcAplicar() {
+  const discs = document.querySelectorAll("#dcDiscs .dc-disc");
+  discs.forEach((el, i) => {
+    const d = i - dc.pos;
+    let x, y, s, o, z;
+    if (d >= 0) { x = d * dc.off; y = d * 5; s = 1 - Math.min(d, 7) * 0.055; o = Math.max(0, 1 - d * 0.13); z = 200 - Math.round(d * 10); }
+    else { x = d * dc.off * 1.6; y = d * 5; s = 1 + d * 0.04; o = Math.max(0, 1 + d * 1.1); z = 100 + Math.round(d * 10); }
+    el.style.transform = `translate(${x.toFixed(1)}px, ${y.toFixed(1)}px) scale(${s.toFixed(3)})`;
+    el.style.opacity = o.toFixed(3);
+    el.style.zIndex = z;
+    el.style.visibility = o < 0.02 ? "hidden" : "visible";
+  });
+  const act = Math.min(dc.N - 1, Math.max(0, Math.round(dc.pos)));
+  if (act !== dc.active) {
+    dc.active = act;
+    discs.forEach((el, i) => el.classList.toggle("on", i === act));
+    dcInfo(act);
+  }
+}
+function dcAnimar() {
+  if (dc.raf) return;
+  const reducido = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const tick = () => {
+    const diff = dc.target - dc.pos;
+    if (reducido || Math.abs(diff) < 0.002) { dc.pos = dc.target; dc.raf = 0; dcAplicar(); return; }
+    dc.pos += diff * 0.13; dcAplicar(); dc.raf = requestAnimationFrame(tick);
+  };
+  dc.raf = requestAnimationFrame(tick);
+}
+const dcIr = (delta) => { dc.target = Math.min(dc.N - 1, Math.max(0, Math.round(dc.target) + delta)); dcAnimar(); };
+const dcAl = (i) => { dc.target = i; dcAnimar(); };
+function dibujarNoticias() {
+  const porNota = new Map();
+  visibles().forEach(r => {
+    const k = r.fuente_url || r.tendencia, a = porNota.get(k);
+    if (!a || r.brecha_nivel > a.brecha_nivel) porNota.set(k, r);
+  });
+  dc.notas = [...porNota.values()].sort((a, b) => String(b.fecha_fuente).localeCompare(String(a.fecha_fuente))).slice(0, 12);
+  dc.N = dc.notas.length; dc.active = -1; dc.pos = dc.target = 0;
+  const caja = $("dcStage").closest(".dc");
+  caja.style.display = dc.N ? "" : "none";
+  $("dcDiscs").innerHTML = dc.notas.map((r, i) => `<div class="dc-disc" data-i="${i}" style="--hc:${HC[r.horizonte]}" aria-label="Nota ${i + 1} de ${dc.N}: ${esc(r.fuente_titulo || r.tendencia)}">
+    <div class="dc-spin"><div class="dc-label"><img src="${esc(foto(r, 320))}" alt="" draggable="false"></div></div></div>`).join("");
+  if (!dc.N) return;
+  dcGeom(); dcAplicar();
+  if (dc.listos) return;
+  dc.listos = true;
+  const st = $("dcStage");
+  $("dcPrev").onclick = () => dcIr(-1);
+  $("dcNext").onclick = () => dcIr(1);
+  st.addEventListener("keydown", (e) => {
+    if (e.key === "ArrowLeft") { e.preventDefault(); dcIr(-1); }
+    else if (e.key === "ArrowRight") { e.preventDefault(); dcIr(1); }
+  });
+  let acum = 0;
+  st.addEventListener("wheel", (e) => {
+    if (Math.abs(e.deltaX) <= Math.abs(e.deltaY)) return; // la rueda vertical sigue moviendo la página
+    e.preventDefault(); acum += e.deltaX;
+    if (Math.abs(acum) > 60) { dcIr(acum > 0 ? 1 : -1); acum = 0; }
+  }, {passive: false});
+  st.addEventListener("pointerdown", (e) => {
+    if (e.button > 0) return;
+    dc.drag = {x: e.clientX, pos: dc.pos, moved: false};
+    const mover = (ev) => {
+      const dx = ev.clientX - dc.drag.x;
+      if (Math.abs(dx) > 5) { dc.drag.moved = true; st.classList.add("arrastrando"); }
+      if (!dc.drag.moved) return;
+      dc.pos = dc.target = Math.min(dc.N - 1, Math.max(0, dc.drag.pos - dx / dc.off));
+      dcAplicar();
+    };
+    const soltar = () => {
+      window.removeEventListener("pointermove", mover); window.removeEventListener("pointerup", soltar); window.removeEventListener("pointercancel", soltar);
+      st.classList.remove("arrastrando");
+      if (dc.drag && dc.drag.moved) { dc.target = Math.round(dc.pos); dcAnimar(); setTimeout(() => { dc.drag = null; }, 0); } else dc.drag = null;
+    };
+    window.addEventListener("pointermove", mover); window.addEventListener("pointerup", soltar); window.addEventListener("pointercancel", soltar);
+  });
+  st.addEventListener("click", (e) => {
+    if (dc.drag && dc.drag.moved) { e.preventDefault(); e.stopPropagation(); return; }
+    const d = e.target.closest(".dc-disc");
+    if (d && +d.dataset.i !== dc.active) dcAl(+d.dataset.i);
+  }, true);
+  window.addEventListener("resize", () => { if (dc.N) { dcGeom(); dcAplicar(); } });
+}
+
+function dibujar() {
+  dibujarHero(); dibujarEstado(); dibujarFiltro(); dibujarPreguntas(); dibujarCarpetas(); dibujarHoy(); dibujarFuturo(); dibujarRank(); dibujarScatter(); dibujarNoticias(); dibujarTabla(); enlazarClics();
+}
+
+// ====== DETALLE ======
+let ultimoFoco = null;
+function abrir(r) {
+  if (!r) return;
+  ultimoFoco = document.activeElement;
+  $("detalle").innerHTML = `
+    <button class="btn cerrar" type="button" id="dCerrar" aria-label="Cerrar detalle">Cerrar ✕</button>
+    <div class="banner"><img src="${esc(foto(r, 900))}" alt=""></div>
+    <div class="meta"><span class="chip" data-h="${r.horizonte}">${r.horizonte}</span><span class="tag">${esc(r.categoria)}</span><span class="tag">Madurez ${r.madurez}/5</span></div>
+    <h2 id="dTitulo">${esc(r.tendencia)}</h2>
+    <p>${esc(r.resumen)}</p>
+    <div class="comp">
+      <div><div class="k">Hoy, en promedio, la industria</div>${esc(r.promedio_industria)}</div>
+      <div><div class="k">Podría llegar a</div>${esc(r.potencial)}</div>
+    </div>
+    <div class="brecha-box"><div class="k" style="font-size:11px;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-3)">La brecha</div>
+      <div>${meter(r.brecha_nivel)} <strong>${r.brecha_nivel} de 5</strong></div>
+      <div>${esc(r.brecha)}</div></div>
+    <div class="fuente-box">
+      <div><strong>Fuente:</strong> ${esc(r.fuente_nombre)} · ${esc(fecha(r.fecha_fuente))}</div>
+      <div>${r.fuente_url ? `<a href="${esc(r.fuente_url)}" target="_blank" rel="noopener">${esc(r.fuente_titulo || r.fuente_url)}</a>` : esc(r.fuente_titulo)}</div>
+      <div>Extraído por el agente el ${esc(fecha(r.fecha_ejecucion))}. Verificá siempre en la nota original.</div>
+    </div>`;
+  $("detalle").classList.add("on"); $("velo").classList.add("on");
+  $("dCerrar").onclick = cerrar; $("dCerrar").focus();
+}
+function cerrar() {
+  $("detalle").classList.remove("on"); $("velo").classList.remove("on");
+  if (ultimoFoco && ultimoFoco.focus) ultimoFoco.focus();
+}
+$("velo").onclick = cerrar;
+document.addEventListener("keydown", (e) => { if (e.key === "Escape") cerrar(); });
+
+$("imgMain").src = unsp(HERO_FOTOS.main, 1100);
+$("imgVinilo").src = unsp(HERO_FOTOS.vinilo, 520);
+$("imgNeon").src = unsp(HERO_FOTOS.neon, 520);
+iniciarHalftone();
+cargar();
+</script>
+</body>
+</html>
