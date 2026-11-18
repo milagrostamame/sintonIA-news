@@ -115,6 +115,27 @@ html, body { margin: 0; height: 100%; background: #16130f; overflow: hidden; fon
 
 .slide:has(.ticker) .pg { display: none; }
 
+/* discos conectados, como los nodos del agente: cada disco es una noticia */
+@keyframes popin { from { scale: 0; opacity: 0; } to { scale: 1; opacity: 1; } }
+@keyframes travel { 0% { left: 0; opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } 100% { left: calc(100% - 20px); opacity: 0; } }
+.flow { position: relative; display: flex; align-items: center; justify-content: space-between; gap: 18px; margin-top: 14px; padding: 12px 0; }
+.flow::before { content: ""; position: absolute; left: 0; right: 0; top: 50%; border-top: 4px dashed var(--ink); opacity: .4; }
+.flow::after { content: ""; position: absolute; top: calc(50% - 10px); left: 0; width: 20px; height: 20px; border-radius: 50%; background: var(--org); border: 3px solid var(--ink); opacity: 0; }
+.slide.active .flow::after { animation: travel 2.8s linear 2.4s infinite; }
+.flow .vin { position: relative; z-index: 1; flex: none; width: 124px; height: 124px; border: 4px solid var(--ink); box-shadow: 6px 6px 0 var(--ink); opacity: 0; }
+.flow .vin:nth-child(2) i { background: var(--blu); } .flow .vin:nth-child(3) i { background: var(--org); } .flow .vin:nth-child(4) i { background: var(--surface); }
+.slide.active .flow .vin { animation: popin .6s cubic-bezier(.34,1.56,.64,1) both, spin 6s linear infinite; animation-delay: calc(var(--d) * .3s + 1s), calc(var(--d) * .3s + 1.6s); }
+.flow .note { position: relative; z-index: 1; flex: none; font: 400 38px/1 var(--disp); text-transform: uppercase; background: var(--org); color: var(--ink); border: 4px solid var(--ink); box-shadow: 6px 6px 0 var(--ink); padding: 18px 26px; opacity: 0; white-space: nowrap; }
+.slide.active .flow .note { animation: popin .6s cubic-bezier(.34,1.56,.64,1) both; animation-delay: calc(var(--d) * .3s + 1s); }
+
+/* locuritas: confeti (C) y modo disco (D) */
+#confeti { position: fixed; inset: 0; pointer-events: none; overflow: hidden; z-index: 40; }
+#confeti span { position: absolute; top: -60px; font: 400 56px var(--disp); will-change: transform; text-shadow: 3px 3px 0 var(--ink); }
+@keyframes disco { to { filter: hue-rotate(360deg) saturate(1.3); } }
+body.disco #stage { animation: disco 3s linear infinite; }
+body.disco .vin { animation-duration: 1.2s !important; }
+.vin:hover { animation-duration: 1.2s; }
+
 /* portada */
 .logo-row { display: flex; align-items: flex-start; }
 .logo { font: 400 250px/.9 var(--disp); margin: 0; }
@@ -131,7 +152,8 @@ html, body { margin: 0; height: 100%; background: #16130f; overflow: hidden; fon
 #prev { left: 0; } #next { right: 0; }
 
 @media (prefers-reduced-motion: reduce) {
-  .spin, .floaty, .cinta, .btn, .ticker div { animation: none !important; }
+  .spin, .floaty, .cinta, .btn, .ticker div, .flow .vin, .flow .note, .flow::after { animation: none !important; }
+  .flow .vin, .flow .note { opacity: 1 !important; }
   .wipe { clip-path: none !important; }
   .slide { transition: none !important; translate: 0 0 !important; }
   .rv { opacity: 1 !important; translate: 0 0 !important; scale: 1 !important; transition: none !important; }
@@ -143,7 +165,8 @@ html, body { margin: 0; height: 100%; background: #16130f; overflow: hidden; fon
   .slide { position: relative; opacity: 1 !important; visibility: visible !important; translate: 0 0 !important; break-after: page; height: 1080px; transition: none; }
   .rv { opacity: 1 !important; translate: 0 0 !important; scale: 1 !important; }
   .wipe { clip-path: none !important; }
-  #bar, #notes, #hint, .nav { display: none !important; }
+  .flow .vin, .flow .note { opacity: 1 !important; animation: none !important; }
+  #bar, #notes, #hint, .nav, #confeti { display: none !important; }
 }
 </style>
 </head>
@@ -230,10 +253,11 @@ html, body { margin: 0; height: 100%; background: #16130f; overflow: hidden; fon
 <!-- 7 FUENTES -->
 <section class="slide" data-notes="Acá se ve de dónde sale cada tendencia. Cada disco es una noticia real. En el ejemplo, una nota de Music Business Worldwide sobre una encuesta de Deezer e Ipsos: el 80% de la gente quiere que la música hecha con IA esté etiquetada. Con Leer nota se abre el original. Y hay una tabla donde cada tendencia tiene su plazo, su brecha, el medio, el enlace a la nota y la fecha. Cualquiera puede entrar y verificar.">
   <p class="sello rv" style="--i:0">Las fuentes</p>
-  <h2 class="t rv" style="--i:1; font-size:140px">Cada disco es <span class="o">una noticia real</span></h2>
+  <h2 class="t rv" style="--i:1; font-size:112px">Cada disco es <span class="o">una noticia real</span></h2>
   <div class="row fill" style="margin-top:20px; gap:56px">
-    <div class="card c-yel tilt1 rv" style="--i:2; flex:1"><p class="num" style="font-size:210px"><span data-count="80">80</span> %</p><h3 style="font-size:56px">quiere la música con IA etiquetada</h3><p class="k">Deezer × Ipsos</p></div>
-    <div class="card tilt2 rv" style="--i:3; flex:1; justify-content:center"><p class="k">transparencia</p><h3 style="font-size:88px">Cada dato, con su nota original</h3></div>
+    <div class="card c-yel tilt1 rv" style="--i:2; flex:1"><p class="num" style="font-size:170px"><span data-count="80">80</span> %</p><h3 style="font-size:50px">quiere la música con IA etiquetada</h3><p class="k" style="font-size:19px; letter-spacing:.1em; line-height:1.6; margin-top:6px">Deezer · Spotify · Music Business Worldwide · Hypebot · Digital Music News · Complete Music Update</p></div>
+    <div class="card tilt2 rv" style="--i:3; flex:1.35; justify-content:center; gap:20px"><p class="k">transparencia</p><h3 style="font-size:76px">Cada dato, con su nota original</h3>
+      <div class="flow"><div class="vin" style="--d:0"><i></i></div><div class="vin" style="--d:1"><i></i></div><div class="vin" style="--d:2"><i></i></div><div class="vin" style="--d:3"><i></i></div><div class="note" style="--d:4">Leer nota ↗</div></div></div>
   </div>
 </section>
 
@@ -277,7 +301,8 @@ html, body { margin: 0; height: 100%; background: #16130f; overflow: hidden; fon
 <button class="nav" id="prev" aria-label="Diapositiva anterior"></button>
 <button class="nav" id="next" aria-label="Diapositiva siguiente"></button>
 <div id="notes" role="region" aria-label="Notas del orador"></div>
-<div id="hint">← → navegar · N notas · F pantalla completa</div>
+<div id="confeti"></div>
+<div id="hint">← → navegar · N notas · F pantalla completa · C confeti · D disco</div>
 
 <script>
 (function () {
@@ -315,6 +340,26 @@ html, body { margin: 0; height: 100%; background: #16130f; overflow: hidden; fon
       el._to = setTimeout(function () { clearInterval(el._iv); el.textContent = to; }, 2200);
     });
   }
+  function confeti() {
+    if (still) return;
+    var box = document.getElementById('confeti');
+    var chars = ['♪', '♫', '✦', '●', '♬'];
+    var cols = ['#f2b705', '#2f5fe0', '#e8481c', '#f8f4e9', '#16130f'];
+    for (var i = 0; i < 90; i++) {
+      var s = document.createElement('span');
+      s.textContent = chars[Math.floor(Math.random() * chars.length)];
+      s.style.left = (Math.random() * 100) + 'vw';
+      s.style.color = cols[Math.floor(Math.random() * cols.length)];
+      s.style.fontSize = (28 + Math.random() * 60) + 'px';
+      box.appendChild(s);
+      var dx = (Math.random() - .5) * 300, dur = 2600 + Math.random() * 2200;
+      var a = s.animate([
+        { transform: 'translate(0,0) rotate(0deg)', opacity: 1 },
+        { transform: 'translate(' + dx + 'px,' + (window.innerHeight + 140) + 'px) rotate(' + ((Math.random() - .5) * 900) + 'deg)', opacity: 1 }
+      ], { duration: dur, delay: Math.random() * 500, easing: 'cubic-bezier(.3,.1,.6,1)', fill: 'forwards' });
+      a.onfinish = (function (el) { return function () { el.remove(); }; })(s);
+    }
+  }
   function show(n) {
     cur = Math.max(0, Math.min(slides.length - 1, n));
     slides.forEach(function (s, i) {
@@ -322,6 +367,7 @@ html, body { margin: 0; height: 100%; background: #16130f; overflow: hidden; fon
       s.classList.toggle('past', i < cur);
     });
     countUp(slides[cur]);
+    if (cur === slides.length - 1) setTimeout(function () { if (cur === slides.length - 1) confeti(); }, 700);
     bar.style.width = ((cur + 1) / slides.length * 100) + '%';
     notes.innerHTML = '<b>Notas del orador · ' + (cur + 1) + '</b>' + (slides[cur].getAttribute('data-notes') || '');
     try { history.replaceState(null, '', '#' + (cur + 1)); } catch (e) {}
@@ -338,6 +384,8 @@ html, body { margin: 0; height: 100%; background: #16130f; overflow: hidden; fon
     else if (k === 'Home') show(0);
     else if (k === 'End') show(slides.length - 1);
     else if (k === 'n' || k === 'N') notes.classList.toggle('on');
+    else if (k === 'c' || k === 'C') confeti();
+    else if (k === 'd' || k === 'D') document.body.classList.toggle('disco');
     else if (k === 'f' || k === 'F') {
       if (document.fullscreenElement) document.exitFullscreen();
       else if (document.documentElement.requestFullscreen) document.documentElement.requestFullscreen();
